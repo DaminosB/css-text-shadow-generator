@@ -253,7 +253,6 @@ label:has(> input[type="color"]) > div {
 
 .focused {
   box-shadow: 0px 0px 5px 3px var(--secondary-color);
-  /* padding: 0.5rem; */
 }
 
 .grabbable {
