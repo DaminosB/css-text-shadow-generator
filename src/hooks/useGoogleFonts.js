@@ -33,30 +33,51 @@ import {
 import { useMemo } from "react";
 
 const useGoogleFonts = () => {
-  const fontLibrary = useMemo(
-    () =>
-      Object.entries(fontConfigs)
-        .flatMap(([type, fonts]) =>
-          fonts.map((instance) => {
-            const cleanedFontLabel = instance.style.fontFamily
-              .split(",")[0]
-              .replaceAll("'", "")
-              .trim();
+  const fontLibrary = Object.entries(fontConfigs)
+    .flatMap(([type, fonts]) =>
+      fonts.map((instance) => {
+        const cleanedFontLabel = instance.style.fontFamily
+          .split(",")[0]
+          .replaceAll("'", "")
+          .trim();
 
-            return {
-              label: cleanedFontLabel,
-              id: cleanedFontLabel.replaceAll(" ", "-"),
-              instance,
-              type,
-            };
-          })
-        )
-        .sort((a, b) => (a.label > b.label ? 1 : -1)),
-    []
-  );
+        return {
+          label: cleanedFontLabel,
+          id: cleanedFontLabel.replaceAll(" ", "-"),
+          instance,
+          type,
+        };
+      })
+    )
+    .sort((a, b) => (a.label > b.label ? 1 : -1));
 
   return { fontLibrary };
 };
+// const useGoogleFonts = () => {
+//   const fontLibrary = useMemo(
+//     () =>
+//       Object.entries(fontConfigs)
+//         .flatMap(([type, fonts]) =>
+//           fonts.map((instance) => {
+//             const cleanedFontLabel = instance.style.fontFamily
+//               .split(",")[0]
+//               .replaceAll("'", "")
+//               .trim();
+
+//             return {
+//               label: cleanedFontLabel,
+//               id: cleanedFontLabel.replaceAll(" ", "-"),
+//               instance,
+//               type,
+//             };
+//           })
+//         )
+//         .sort((a, b) => (a.label > b.label ? 1 : -1)),
+//     []
+//   );
+
+//   return { fontLibrary };
+// };
 
 const inter = Inter({ subsets: ["latin"], display: "swap" });
 const dancingScript = Dancing_Script({ subsets: ["latin"], display: "swap" });
