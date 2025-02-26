@@ -1,0 +1,18 @@
+.workspace {
+  height: 100%;
+  overflow: hidden;
+}
+
+/* .header {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: var(--header-height);
+  align-content: center;
+  padding: 0 1.5rem;
+} */
+.previewWindow {
+  display: flex;
+  height: 100%;
+}

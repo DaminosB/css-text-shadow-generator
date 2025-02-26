@@ -1,0 +1,11 @@
+.inputFrame {
+  /* padding: 0.5rem; */
+  transition: box-shadow var(--fast-transition) var(--default-animation);
+}
+
+.inputFrame > label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  white-space: nowrap;
+}

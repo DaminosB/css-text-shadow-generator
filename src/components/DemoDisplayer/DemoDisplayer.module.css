@@ -1,0 +1,72 @@
+.toogleButton {
+  font-size: 1.5rem;
+  padding: 1.5rem;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  color: var(--secondary-color);
+  filter: var(--icon-shadow);
+}
+
+.demoDisplayer {
+  position: absolute;
+  inset: 0px;
+  z-index: 1;
+  transition: var(--fast-transition) var(--default-animation);
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  visibility: hidden;
+  opacity: 0;
+}
+
+.demoDisplayer.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.demoWindow {
+  position: relative;
+  background-color: var(--primary-color);
+  border: var(--default-border);
+  /* width: 25%;
+  height: 25%; */
+  color: var(--secondary-color);
+  padding: 0.75rem;
+  margin-left: 1rem;
+  max-width: 25%;
+  transition: var(--fast-transition) var(--default-animation);
+}
+
+.demoWindow > button:first-of-type {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  /* font-size: 0.75rem; */
+  color: var(--secondary-color);
+}
+
+.demoWindow > p {
+  min-height: 1rem;
+}
+
+.demoWindow > div {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.demoWindow > div > button {
+  margin-left: 1rem;
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
+  transition: var(--fast-transition) var(--default-animation);
+}
+
+.demoWindow > div > button svg {
+  font-size: 0.75rem;
+}

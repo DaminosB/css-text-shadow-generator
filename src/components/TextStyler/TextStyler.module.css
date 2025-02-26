@@ -1,0 +1,38 @@
+.textStyler {
+  display: flex;
+  flex-direction: column;
+  border: var(--default-border);
+}
+
+.textStyler > div:first-of-type {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.25rem;
+  padding: 0.5rem;
+}
+
+.textStyler > div:last-of-type {
+  max-height: 100vh;
+  margin-top: 1.25rem;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  transition: var(--fast-transition) var(--default-animation);
+}
+
+.textStyler.closed > div:last-of-type {
+  max-height: 0;
+  margin-top: 0;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.textStyler > div:first-of-type > button {
+  transition: var(--fast-transition) var(--default-animation);
+}
+
+.textStyler.closed > div:first-of-type > button {
+  transform: rotate(180deg);
+}

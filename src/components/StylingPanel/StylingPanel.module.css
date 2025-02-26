@@ -1,0 +1,99 @@
+.stylingPanel {
+  position: relative;
+  top: 0px;
+  left: 0px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  width: 25%;
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
+  transition: var(--fast-transition) var(--default-animation);
+  padding-top: var(--header-height);
+}
+
+.stylingPanel > div {
+  transition: inherit;
+  white-space: nowrap;
+}
+
+.stylingPanel.closed {
+  width: 0%;
+}
+
+.buttonContainer {
+  position: absolute;
+  left: 100%;
+  top: var(--header-height);
+  margin-left: 1rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  font-size: 2.5rem;
+}
+
+.buttonContainer > button {
+  width: 100%;
+  height: 100%;
+}
+
+.buttonContainer > button > span {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  height: 100%;
+  width: 100%;
+  text-align: left;
+  display: inline-block;
+  opacity: 0;
+  transition: var(--fast-transition) var(--default-animation);
+}
+
+.buttonContainer > button > span {
+  filter: var(--icon-shadow);
+}
+
+.buttonContainer > button > span.active {
+  z-index: 1;
+  opacity: 1;
+}
+
+.stylingPanel > .optionsScroller {
+  /* height: calc(100% - var(--header-height)); */
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  padding: 0 var(--styling-panel-x-margins);
+}
+
+.stylingPanel > .optionsScroller > div:last-child {
+  position: sticky;
+  bottom: 0px;
+  z-index: 1;
+  padding: 1rem 0;
+  display: flex;
+  align-items: center;
+  scrollbar-gutter: stable;
+  background-color: var(--primary-color);
+}
+
+.stylingPanel > .optionsScroller > div:last-child > button {
+  width: 100%;
+  background-color: var(--secondary-color-high-transparency);
+  padding: 0.25rem 0;
+  font-size: 1.25rem;
+  transition: var(--fast-transition) var(--default-animation);
+  overflow: hidden;
+}
+
+.stylingPanel > .optionsScroller > div:last-child > button:hover {
+  background-color: var(--secondary-color-medium-transparency);
+}
+
+.stylingPanel.closed > div {
+  padding: 0;
+}

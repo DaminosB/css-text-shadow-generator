@@ -1,0 +1,25 @@
+.textPreview {
+  height: 100%;
+  flex: 1;
+}
+
+.textPreview > div {
+  height: 100%;
+}
+
+.textPreview > div:last-child {
+  height: 100%;
+  width: 100%;
+}
+
+.textPreview textarea {
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  align-content: center;
+  resize: none;
+}
+
+.textPreview textarea.transition {
+  transition: var(--fast-transition) var(--default-animation);
+}
