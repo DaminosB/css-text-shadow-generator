@@ -17,14 +17,17 @@ import useDemoPattern from "@/hooks/useDemoPattern";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faCheck,
   faChevronLeft,
   faChevronRight,
   faQuestion,
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
+import parse from "@/utils/parse";
 
 const DemoDisplayer = () => {
   const [demoStep, setDemoStep] = useState(0);
+  const [showConfirmationBox, setShowConfirmationBox] = useState(false);
 
   const textSettings = useSelector((state) => state.textSettings);
 
@@ -58,53 +61,61 @@ const DemoDisplayer = () => {
       right: scrollerRight = 0,
     } = scroller ? scroller.getBoundingClientRect() : {};
 
-    const demoWindowPositions = {
-      top:
-        focusedContainerRect.top +
-        focusedContainerRect.height / 2 -
-        demoWindow.offsetHeight / 2,
-      left: scrollerRight,
-    };
+    let newX = scrollerRight;
+    let newY =
+      focusedContainerRect.top +
+      focusedContainerRect.height / 2 -
+      demoWindow.offsetHeight / 2;
+
+    const bottomOffset = scroller?.lastElementChild.offsetHeight;
 
     if (scroller && scrollerTop > focusedContainerRect.top) {
       const difference = scrollerTop - focusedContainerRect.top;
-      demoWindowPositions.top += difference;
+      newY += difference;
       scroller?.scrollBy({ top: -difference, behavior: "smooth" });
-    } else if (scroller && scrollerBottom < focusedContainerRect.bottom) {
-      const difference = focusedContainerRect.bottom - scrollerBottom;
-      demoWindowPositions.top -= difference;
+    } else if (
+      scroller &&
+      scrollerBottom - bottomOffset < focusedContainerRect.bottom
+    ) {
+      const difference =
+        focusedContainerRect.bottom - scrollerBottom + bottomOffset;
+      newY -= difference;
       scroller?.scrollBy({ top: difference, behavior: "smooth" });
     }
 
-    demoWindow.style.transform = `translate(${demoWindowPositions.left}px, ${demoWindowPositions.top}px)`;
+    const demoWindowWidth = demoWindow.offsetWidth;
+    const demoWindowHeight = demoWindow.offsetHeight;
+    newX = adjustBoxPosition(newX, demoWindowWidth, "x");
+    newY = adjustBoxPosition(newY, demoWindowHeight, "y");
+
+    demoWindow.style.transform = `translate(${newX}px, ${newY}px)`;
   }, []);
 
-  const toggleDemoMode = useCallback(() => {
-    const newBoolean = !isDemoMode;
+  const adjustBoxPosition = useCallback((initialPosition, boxSize, axis) => {
+    const windowSize = axis === "x" ? window.innerWidth : window.innerHeight;
+    return Math.max(0, Math.min(initialPosition, windowSize - boxSize));
+  }, []);
 
-    setIsDemoMode(newBoolean);
+  const toggleDemoMode = useCallback(
+    (newBoolean) => {
+      setIsDemoMode(newBoolean);
 
-    const focusedContainer = document.getElementById(
-      currentStep.inputData.inputContainerId
-    );
+      const focusedContainer = document.getElementById(
+        currentStep.inputData.inputContainerId
+      );
 
-    if (newBoolean) {
-      posDemoWindow(currentStep);
-      focusedContainer.classList.add("focused");
-      dispatch(replaceState(currentStep.state));
-      cachedState.current = textSettings;
-    } else {
-      focusedContainer.classList.remove("focused");
-      dispatch(replaceState(cachedState.current));
-    }
-  }, [
-    isDemoMode,
-    currentStep,
-    dispatch,
-    posDemoWindow,
-    setIsDemoMode,
-    textSettings,
-  ]);
+      if (newBoolean) {
+        posDemoWindow(currentStep);
+        focusedContainer.classList.add("focused");
+        dispatch(replaceState(currentStep.state));
+        cachedState.current = textSettings;
+      } else {
+        focusedContainer.classList.remove("focused");
+        dispatch(replaceState(cachedState.current));
+      }
+    },
+    [currentStep, dispatch, posDemoWindow, setIsDemoMode, textSettings]
+  );
 
   const navigateDemoMode = useCallback(
     (newIndex) => {
@@ -129,20 +140,90 @@ const DemoDisplayer = () => {
     [currentStep, dispatch, posDemoWindow, demoPattern]
   );
 
+  const displayConfirmationBox = useCallback(
+    (e) => {
+      const confirmationBox = Array.from(e.target.children).find((child) =>
+        child.className.includes(styles.confirmationBox)
+      );
+
+      const boxWidth = confirmationBox.offsetWidth;
+      const boxHeight = confirmationBox.offsetHeight;
+
+      let newX = e.clientX - boxWidth / 2;
+      let newY = e.clientY - boxHeight / 2;
+
+      newX = adjustBoxPosition(newX, boxWidth, "x");
+      newY = adjustBoxPosition(newY, boxHeight, "y");
+
+      confirmationBox.style.transform = `translate(${newX}px, ${newY}px)`;
+
+      setShowConfirmationBox(true);
+    },
+    [setShowConfirmationBox, adjustBoxPosition]
+  );
+
+  const handleDemoWindowClick = useCallback(
+    (e) => {
+      e.stopPropagation();
+      setShowConfirmationBox(false);
+    },
+    [setShowConfirmationBox]
+  );
+
+  const handleConfirmationBoxClick = useCallback(
+    (e) => {
+      e.stopPropagation();
+      setShowConfirmationBox(false);
+
+      if (parse(e.currentTarget.value)) toggleDemoMode(false);
+    },
+    [setShowConfirmationBox, toggleDemoMode]
+  );
+
   useEffect(() => {
     posDemoWindow(currentStep);
   }, []);
 
+  const demoDisplayerClasses = useMemo(
+    () =>
+      `${styles.demoDisplayer} ${isDemoMode ? styles.open : ""} ${
+        showConfirmationBox ? styles.darker : ""
+      }`,
+    [isDemoMode, showConfirmationBox]
+  );
+
   return (
     <>
-      <button className={styles.toogleButton} onClick={toggleDemoMode}>
+      <button
+        className={styles.toogleButton}
+        onClick={() => toggleDemoMode(!isDemoMode)}
+      >
         <FontAwesomeIcon icon={faQuestion} />
       </button>
-      <div
-        className={`${styles.demoDisplayer} ${isDemoMode ? styles.open : ""}`}
-      >
-        <div className={`${styles.demoWindow} focused`} ref={demoWindowRef}>
-          <button onClick={toggleDemoMode}>
+      <div className={demoDisplayerClasses} onClick={displayConfirmationBox}>
+        <div
+          className={`${styles.confirmationBox} ${
+            showConfirmationBox ? "" : "hidden"
+          } focused`}
+        >
+          <div>
+            <h3>Leave the demo mode?</h3>
+          </div>
+          <div>
+            <button value={true} onClick={handleConfirmationBoxClick}>
+              <FontAwesomeIcon icon={faCheck} /> <span>Yes</span>
+            </button>
+            <button value={false} onClick={handleConfirmationBoxClick}>
+              <FontAwesomeIcon icon={faXmark} /> <span>No</span>
+            </button>
+          </div>
+        </div>
+        <div
+          className={`${styles.demoWindow} focused`}
+          ref={demoWindowRef}
+          onClick={handleDemoWindowClick}
+        >
+          <button onClick={() => toggleDemoMode(false)}>
             <FontAwesomeIcon icon={faXmark} />
           </button>
           <p>{demoStep !== null && currentStep.demoText}</p>

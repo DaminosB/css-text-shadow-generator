@@ -21,6 +21,7 @@
   overflow: hidden;
   visibility: hidden;
   opacity: 0;
+  color: var(--secondary-color);
 }
 
 .demoDisplayer.open {
@@ -28,13 +29,41 @@
   visibility: visible;
 }
 
+.demoDisplayer.darker {
+  background-color: var(--primary-color-high-transparency);
+}
+
+.confirmationBox {
+  position: absolute;
+  padding: 1rem;
+  background-color: var(--primary-color);
+  z-index: 1;
+  transition: var(--fast-transition) var(--default-animation);
+}
+
+.confirmationBox > div:last-of-type {
+  margin-top: 1rem;
+  display: flex;
+  /* justify-content: space-around; */
+  gap: 1rem;
+}
+
+.confirmationBox > div:last-of-type > button {
+  flex: 1;
+  border: var(--default-border);
+  padding: 0.5rem;
+  background-color: var(--secondary-color-high-transparency);
+  transition: var(--fast-transition) var(--default-animation);
+}
+
+.confirmationBox > div:last-of-type > button:hover {
+  background-color: transparent;
+}
+
 .demoWindow {
   position: relative;
   background-color: var(--primary-color);
   border: var(--default-border);
-  /* width: 25%;
-  height: 25%; */
-  color: var(--secondary-color);
   padding: 0.75rem;
   margin-left: 1rem;
   max-width: 25%;
