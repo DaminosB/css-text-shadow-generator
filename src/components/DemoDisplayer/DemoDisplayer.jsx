@@ -37,7 +37,7 @@ const DemoDisplayer = () => {
 
   const dispatch = useDispatch();
 
-  const demoWindowRef = useRef(null);
+  const demoBoxRef = useRef(null);
 
   const currentStep = useMemo(
     () => demoPattern[demoStep],
@@ -46,66 +46,75 @@ const DemoDisplayer = () => {
 
   const cachedState = useRef(textSettings);
 
-  const posDemoWindow = useCallback((currentStep) => {
-    const focusedContainer = document.getElementById(
-      currentStep.inputData.inputContainerId
-    );
+  const posDemoBox = useCallback((currentStep) => {
+    const { inputData, demoConfig } = currentStep;
 
-    const scroller = focusedContainer.closest('[data-role="scroller"]');
-    const demoWindow = demoWindowRef.current;
+    const targetElement = document.getElementById(inputData.inputContainerId);
+    const scroller = targetElement.closest('[data-role="scroller"]');
+    const demoBox = demoBoxRef.current;
 
-    const focusedContainerRect = focusedContainer.getBoundingClientRect();
     const {
-      top: scrollerTop = 0,
-      bottom: scrollerBottom = 0,
-      right: scrollerRight = 0,
-    } = scroller ? scroller.getBoundingClientRect() : {};
+      top: targetTop,
+      bottom: targetBottom,
+      left: targetLeft,
+      right: targetRight,
+      height: targetHeight,
+    } = targetElement.getBoundingClientRect();
 
-    let newX = scrollerRight;
-    let newY =
-      focusedContainerRect.top +
-      focusedContainerRect.height / 2 -
-      demoWindow.offsetHeight / 2;
+    let newX =
+      demoConfig.alignment === "left"
+        ? targetLeft - demoBox.offsetWidth
+        : targetRight;
+    let newY = targetTop + targetHeight / 2 - demoBox.offsetHeight / 2;
 
-    const bottomOffset = scroller?.lastElementChild.offsetHeight;
+    if (scroller) {
+      const { top: scrollerTop = 0, bottom: scrollerBottom = 0 } =
+        scroller.getBoundingClientRect();
+      const lastScrollerChild = scroller.lastElementChild;
 
-    if (scroller && scrollerTop > focusedContainerRect.top) {
-      const difference = scrollerTop - focusedContainerRect.top;
-      newY += difference;
-      scroller?.scrollBy({ top: -difference, behavior: "smooth" });
-    } else if (
-      scroller &&
-      scrollerBottom - bottomOffset < focusedContainerRect.bottom
-    ) {
-      const difference =
-        focusedContainerRect.bottom - scrollerBottom + bottomOffset;
-      newY -= difference;
-      scroller?.scrollBy({ top: difference, behavior: "smooth" });
+      const bottomOffset = !lastScrollerChild.contains(targetElement)
+        ? lastScrollerChild.offsetHeight
+        : 0;
+
+      const isAboveViewport = targetTop < scrollerTop;
+      const isBelowViewport = targetBottom > scrollerBottom - bottomOffset;
+
+      if (isAboveViewport) {
+        const offset = scrollerTop - targetTop;
+        newY += offset;
+        scroller.scrollBy({ top: -offset, behavior: "smooth" });
+      }
+
+      if (isBelowViewport) {
+        const offset = targetBottom - scrollerBottom + bottomOffset;
+        newY -= offset;
+        scroller.scrollBy({ top: offset, behavior: "smooth" });
+      }
     }
 
-    const demoWindowWidth = demoWindow.offsetWidth;
-    const demoWindowHeight = demoWindow.offsetHeight;
-    newX = adjustBoxPosition(newX, demoWindowWidth, "x");
-    newY = adjustBoxPosition(newY, demoWindowHeight, "y");
+    const boxSize = {
+      width: demoBox.offsetWidth,
+      height: demoBox.offsetHeight,
+    };
 
-    demoWindow.style.transform = `translate(${newX}px, ${newY}px)`;
-  }, []);
+    ({ adjustedX: newX, adjustedY: newY } = adjustBoxPosition(
+      newX,
+      newY,
+      boxSize
+    ));
 
-  const adjustBoxPosition = useCallback((initialPosition, boxSize, axis) => {
-    const windowSize = axis === "x" ? window.innerWidth : window.innerHeight;
-    return Math.max(0, Math.min(initialPosition, windowSize - boxSize));
+    demoBox.style.transform = `translate(${newX}px, ${newY}px)`;
   }, []);
 
   const toggleDemoMode = useCallback(
-    (newBoolean) => {
-      setIsDemoMode(newBoolean);
+    (enable) => {
+      setIsDemoMode(enable);
 
       const focusedContainer = document.getElementById(
         currentStep.inputData.inputContainerId
       );
 
-      if (newBoolean) {
-        posDemoWindow(currentStep);
+      if (enable) {
         focusedContainer.classList.add("focused");
         dispatch(replaceState(currentStep.state));
         cachedState.current = textSettings;
@@ -114,7 +123,7 @@ const DemoDisplayer = () => {
         dispatch(replaceState(cachedState.current));
       }
     },
-    [currentStep, dispatch, posDemoWindow, setIsDemoMode, textSettings]
+    [currentStep, dispatch, setIsDemoMode, textSettings]
   );
 
   const navigateDemoMode = useCallback(
@@ -123,8 +132,6 @@ const DemoDisplayer = () => {
       const newStep = demoPattern[newIndex];
       dispatch(replaceState(newStep.state));
       requestAnimationFrame(() => {
-        posDemoWindow(newStep);
-
         const currentFocusedContainer = document.getElementById(
           currentStep.inputData.inputContainerId
         );
@@ -137,29 +144,40 @@ const DemoDisplayer = () => {
         if (nextFocusedContainer) nextFocusedContainer.classList.add("focused");
       });
     },
-    [currentStep, dispatch, posDemoWindow, demoPattern]
+    [currentStep, dispatch, demoPattern]
   );
 
   const displayConfirmationBox = useCallback(
-    (e) => {
-      const confirmationBox = Array.from(e.target.children).find((child) =>
-        child.className.includes(styles.confirmationBox)
-      );
+    (x, y, confirmationBox) => {
+      const boxSize = {
+        width: confirmationBox.offsetWidth,
+        height: confirmationBox.offsetHeight,
+      };
 
-      const boxWidth = confirmationBox.offsetWidth;
-      const boxHeight = confirmationBox.offsetHeight;
+      let newX = x - boxSize.width / 2;
+      let newY = y - boxSize.height / 2;
 
-      let newX = e.clientX - boxWidth / 2;
-      let newY = e.clientY - boxHeight / 2;
-
-      newX = adjustBoxPosition(newX, boxWidth, "x");
-      newY = adjustBoxPosition(newY, boxHeight, "y");
+      ({ adjustedX: newX, adjustedY: newY } = adjustBoxPosition(
+        newX,
+        newY,
+        boxSize
+      ));
 
       confirmationBox.style.transform = `translate(${newX}px, ${newY}px)`;
 
       setShowConfirmationBox(true);
     },
-    [setShowConfirmationBox, adjustBoxPosition]
+    [setShowConfirmationBox]
+  );
+
+  const handleDisplayConfirmationBox = useCallback(
+    (e) => {
+      const confirmationBox = Array.from(e.target.children).find((child) =>
+        child.className.includes(styles.confirmationBox)
+      );
+      displayConfirmationBox(e.clientX, e.clientY, confirmationBox);
+    },
+    [displayConfirmationBox]
   );
 
   const handleDemoWindowClick = useCallback(
@@ -172,17 +190,88 @@ const DemoDisplayer = () => {
 
   const handleConfirmationBoxClick = useCallback(
     (e) => {
-      e.stopPropagation();
       setShowConfirmationBox(false);
-
       if (parse(e.currentTarget.value)) toggleDemoMode(false);
     },
     [setShowConfirmationBox, toggleDemoMode]
   );
 
   useEffect(() => {
-    posDemoWindow(currentStep);
-  }, []);
+    posDemoBox(currentStep);
+
+    const controller = new AbortController();
+    const { signal } = controller;
+
+    window.addEventListener(
+      "keydown",
+      (e) => {
+        if (!isDemoMode) return;
+
+        const demoDisplayer = document.querySelector(
+          `.${styles.demoDisplayer}`
+        );
+        demoDisplayer.focus();
+
+        const confirmationBox = document.querySelector(
+          `.${styles.confirmationBox}`
+        );
+
+        switch (e.code) {
+          case "ArrowRight":
+            if (demoStep < demoPattern.length - 1) {
+              navigateDemoMode(demoStep + 1);
+            } else {
+              displayConfirmationBox(
+                window.innerWidth / 2,
+                window.innerHeight / 2,
+                confirmationBox
+              );
+            }
+            break;
+
+          case "ArrowLeft":
+            if (demoStep > 0) navigateDemoMode(demoStep - 1);
+            else navigateDemoMode(demoPattern.length - 1);
+            break;
+
+          case "Escape":
+            if (showConfirmationBox) {
+              setShowConfirmationBox(false);
+            } else {
+              displayConfirmationBox(
+                window.innerWidth / 2,
+                window.innerHeight / 2,
+                confirmationBox
+              );
+            }
+            break;
+
+          case "Enter":
+            if (showConfirmationBox) {
+              setShowConfirmationBox(false);
+              toggleDemoMode(false);
+            }
+            break;
+
+          default:
+            break;
+        }
+      },
+      { signal }
+    );
+
+    return () => controller.abort();
+  }, [
+    isDemoMode,
+    demoStep,
+    showConfirmationBox,
+    currentStep,
+    demoPattern,
+    displayConfirmationBox,
+    toggleDemoMode,
+    navigateDemoMode,
+    posDemoBox,
+  ]);
 
   const demoDisplayerClasses = useMemo(
     () =>
@@ -200,11 +289,16 @@ const DemoDisplayer = () => {
       >
         <FontAwesomeIcon icon={faQuestion} />
       </button>
-      <div className={demoDisplayerClasses} onClick={displayConfirmationBox}>
+      <div
+        className={demoDisplayerClasses}
+        onClick={handleDisplayConfirmationBox}
+        tabIndex={0}
+      >
         <div
           className={`${styles.confirmationBox} ${
             showConfirmationBox ? "" : "hidden"
           } focused`}
+          onClick={(e) => e.stopPropagation()}
         >
           <div>
             <h3>Leave the demo mode?</h3>
@@ -218,30 +312,28 @@ const DemoDisplayer = () => {
             </button>
           </div>
         </div>
-        <div
-          className={`${styles.demoWindow} focused`}
-          ref={demoWindowRef}
-          onClick={handleDemoWindowClick}
-        >
-          <button onClick={() => toggleDemoMode(false)}>
-            <FontAwesomeIcon icon={faXmark} />
-          </button>
-          <p>{demoStep !== null && currentStep.demoText}</p>
-          <div>
-            <button
-              className={demoStep === 0 ? "hidden" : ""}
-              onClick={() => navigateDemoMode(demoStep - 1)}
-            >
-              <FontAwesomeIcon icon={faChevronLeft} />
-              <span>Prev</span>
+        <div ref={demoBoxRef} onClick={handleDemoWindowClick}>
+          <div className={`${styles.demoBox} focused`}>
+            <button onClick={() => toggleDemoMode(false)}>
+              <FontAwesomeIcon icon={faXmark} />
             </button>
-            <button
-              className={demoStep === demoPattern.length - 1 ? "hidden" : ""}
-              onClick={() => navigateDemoMode(demoStep + 1)}
-            >
-              <span>Next</span>
-              <FontAwesomeIcon icon={faChevronRight} />
-            </button>
+            <p>{demoStep !== null && currentStep.demoConfig.text}</p>
+            <div>
+              <button
+                className={demoStep === 0 ? "hidden" : ""}
+                onClick={() => navigateDemoMode(demoStep - 1)}
+              >
+                <FontAwesomeIcon icon={faChevronLeft} />
+                <span>Prev</span>
+              </button>
+              <button
+                className={demoStep === demoPattern.length - 1 ? "hidden" : ""}
+                onClick={() => navigateDemoMode(demoStep + 1)}
+              >
+                <span>Next</span>
+                <FontAwesomeIcon icon={faChevronRight} />
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -250,3 +342,13 @@ const DemoDisplayer = () => {
 };
 
 export default DemoDisplayer;
+
+const adjustBoxPosition = (x, y, boxSize) => {
+  const adjustedX = Math.max(0, Math.min(x, window.innerWidth - boxSize.width));
+  const adjustedY = Math.max(
+    0,
+    Math.min(y, window.innerHeight - boxSize.height)
+  );
+
+  return { adjustedX, adjustedY };
+};

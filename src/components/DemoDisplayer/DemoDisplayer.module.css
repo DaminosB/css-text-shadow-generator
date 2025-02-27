@@ -60,35 +60,37 @@
   background-color: transparent;
 }
 
-.demoWindow {
-  position: relative;
-  background-color: var(--primary-color);
-  border: var(--default-border);
-  padding: 0.75rem;
-  margin-left: 1rem;
+div:has(> .demoBox) {
+  padding: 0 1rem;
   max-width: 25%;
   transition: var(--fast-transition) var(--default-animation);
 }
 
-.demoWindow > button:first-of-type {
+.demoBox {
+  position: relative;
+  background-color: var(--primary-color);
+  border: var(--default-border);
+  padding: 0.75rem;
+}
+
+.demoBox > button:first-of-type {
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;
-  /* font-size: 0.75rem; */
   color: var(--secondary-color);
 }
 
-.demoWindow > p {
+.demoBox > p {
   min-height: 1rem;
 }
 
-.demoWindow > div {
+.demoBox > div {
   margin-top: 1rem;
   display: flex;
   justify-content: flex-end;
 }
 
-.demoWindow > div > button {
+.demoBox > div > button {
   margin-left: 1rem;
   display: inline-flex;
   gap: 0.5rem;
@@ -96,6 +98,6 @@
   transition: var(--fast-transition) var(--default-animation);
 }
 
-.demoWindow > div > button svg {
+.demoBox > div > button svg {
   font-size: 0.75rem;
 }

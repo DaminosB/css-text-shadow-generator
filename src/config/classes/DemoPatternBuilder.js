@@ -4,54 +4,47 @@ export default class DemoPatternBuilder {
     this.steps = [];
   }
 
-  addValueChangeStep(inputName, path, targetValue, demoText) {
+  addValueChangeStep(inputName, path, targetValue, demoConfig) {
     this.addStep({
       action: "value-change",
       inputName,
       path,
       targetValue,
-      demoText,
+      demoConfig,
     });
     return this;
   }
 
-  addAppendValueStep(inputData, path, element, demoText) {
+  addAppendValueStep(inputData, path, element, demoConfig) {
     this.addStep({
       action: "append-value",
       path,
       targetValue: element,
       inputData,
-      demoText,
+      demoConfig,
     });
     return this;
   }
 
-  addRemoveValueStep(inputData, path, index, demoText) {
+  addRemoveValueStep(inputData, path, index, demoConfig) {
     this.addStep({
       action: "remove-value",
       path,
       targetValue: index,
       inputData,
-      demoText,
+      demoConfig,
     });
     return this;
   }
 
-  addMultipleValueChangeStep(inputData, path, updates, demoText) {
+  addMultipleValueChangeStep(inputData, path, updates, demoConfig) {
     this.addStep({
       action: "multiple-value-change",
       path,
       updates,
       ...inputData,
-      demoText,
+      demoConfig,
     });
-    // this.steps.push({
-    //   action: "multiple-value-change",
-    //   path,
-    //   updates,
-    //   inputData,
-    //   demoText,
-    // });
     return this;
   }
 
