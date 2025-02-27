@@ -22,17 +22,17 @@ export default class TextConfig {
       minValue: 1,
     },
     {
-      name: "textColor",
-      value: "#000000",
-      labelText: "text color",
-      icon: faPaintBrush,
-      type: "color",
-    },
-    {
       name: "backgroundColor",
       value: "#FFFFFF",
       labelText: "background color",
       icon: faFillDrip,
+      type: "color",
+    },
+    {
+      name: "textColor",
+      value: "#000000",
+      labelText: "text color",
+      icon: faPaintBrush,
       type: "color",
     },
     {
