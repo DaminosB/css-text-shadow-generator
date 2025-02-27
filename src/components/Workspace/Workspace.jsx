@@ -9,7 +9,7 @@ export const WorkspaceCtxt = createContext();
 import { Provider } from "react-redux";
 import { store } from "@/features/store";
 
-import PropertyOutput from "../PropertyOutput/PropertyOutput";
+import OutputBox from "../OutputBox/OutputBox";
 import TextPreview from "../TextPreview/TextPreview";
 import StylingPanel from "../StylingPanel/StylingPanel";
 
@@ -39,7 +39,7 @@ const Workspace = ({ fontLibrary }) => {
             <StylingPanel />
             <TextPreview />
           </div>
-          <PropertyOutput />
+          <OutputBox />
           <DemoDisplayer />
         </div>
       </WorkspaceCtxt.Provider>

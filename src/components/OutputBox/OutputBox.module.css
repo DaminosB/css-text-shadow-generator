@@ -5,6 +5,7 @@
   right: 5rem;
   color: var(--secondary-color);
   width: 23rem;
+  transition: var(--fast-transition) var(--default-animation);
 }
 
 .output > div:first-child {

@@ -1,4 +1,4 @@
-import styles from "./PropertyOutput.module.css";
+import styles from "./OutputBox.module.css";
 
 import { useState, useContext, useMemo } from "react";
 import { WorkspaceCtxt } from "../Workspace/Workspace";
@@ -9,7 +9,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCopy } from "@fortawesome/free-regular-svg-icons";
 import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
 
-const PropertyOutput = () => {
+const OutputBox = () => {
   const textSettings = useSelector((store) => store.textSettings);
   const { shadows } = textSettings;
 
@@ -49,41 +49,6 @@ const PropertyOutput = () => {
     [shadows]
   );
 
-  // const outputStrings = useMemo(
-  //   () =>
-  //     shadows
-  //       .map((shadow) =>
-  //         shadow.inputs.reduce(
-  //           (acc, input) => ({ ...acc, [input.name]: input.value }),
-  //           {}
-  //         )
-  //       )
-  //       .filter(
-  //         ({ xShadowLength, yShadowLength, blurRadius, isVisible }) =>
-  //           isVisible &&
-  //           (xShadowLength !== 0 || yShadowLength !== 0 || blurRadius !== 0)
-  //       )
-  //       .map((shadow, index, array) => {
-  //         const {
-  //           xShadowLength,
-  //           yShadowLength,
-  //           blurRadius,
-  //           shadowColor,
-  //           inheritTextColor,
-  //         } = shadow;
-
-  //         let output = `${xShadowLength}px ${yShadowLength}px ${blurRadius}px`;
-
-  //         if (!inheritTextColor) output += ` ${shadowColor}`;
-
-  //         if (index < array.length - 1) output += ",\n";
-  //         else output += ";";
-
-  //         return output;
-  //       }),
-  //   [shadows]
-  // );
-
   const copyToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(
@@ -99,7 +64,10 @@ const PropertyOutput = () => {
   };
 
   return (
-    <div className={`${styles.output} ${!isOpen ? styles.closed : ""}`}>
+    <div
+      id="output-box"
+      className={`${styles.output} ${!isOpen ? styles.closed : ""}`}
+    >
       <div>
         <h2>Output</h2>
         <div>
@@ -141,4 +109,4 @@ const PropertyOutput = () => {
   );
 };
 
-export default PropertyOutput;
+export default OutputBox;
