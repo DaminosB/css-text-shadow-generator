@@ -1,15 +1,7 @@
 .textPreview {
   height: 100%;
   flex: 1;
-}
-
-.textPreview > div {
-  height: 100%;
-}
-
-.textPreview > div:last-child {
-  height: 100%;
-  width: 100%;
+  position: relative;
 }
 
 .textPreview textarea {

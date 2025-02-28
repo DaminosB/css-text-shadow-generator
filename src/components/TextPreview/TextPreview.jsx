@@ -5,6 +5,7 @@ import { WorkspaceCtxt } from "../Workspace/Workspace";
 
 import { useSelector, useDispatch } from "react-redux";
 import { updateRootSettings } from "@/features/textSettings/textSettingsSlice";
+import OutputBox from "../OutputBox/OutputBox";
 
 const TextPreview = () => {
   const { fontLibrary, highlightedShadow, isDemoMode } =
@@ -67,6 +68,7 @@ const TextPreview = () => {
         value={textConfig.userText.value}
         onChange={dispatchRootUpdate}
       ></textarea>
+      <OutputBox />
     </div>
   );
 };

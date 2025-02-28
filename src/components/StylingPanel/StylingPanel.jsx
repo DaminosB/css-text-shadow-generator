@@ -44,13 +44,15 @@ const StylingPanel = () => {
         ref={scrollerRef}
         data-role="scroller"
       >
-        <TextStyler />
-        <ShadowsList />
         <div>
-          <button id="append-button" onClick={addShadowAndScroll}>
-            <FontAwesomeIcon icon={faPlus} /> Add a layer
-          </button>
+          <TextStyler />
+          <ShadowsList />
         </div>
+      </div>
+      <div>
+        <button id="append-button" onClick={addShadowAndScroll}>
+          <FontAwesomeIcon icon={faPlus} /> Add a layer
+        </button>
       </div>
     </div>
   );

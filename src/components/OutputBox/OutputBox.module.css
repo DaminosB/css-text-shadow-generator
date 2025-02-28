@@ -52,3 +52,18 @@
 span.incremented {
   margin-left: 2rem;
 }
+
+@media (max-width: 1023px) {
+  .output {
+    top: unset;
+    bottom: 1rem;
+    right: 1rem;
+  }
+}
+
+@media (max-width: 500px) {
+  .output {
+    top: 1rem;
+    right: 1rem;
+  }
+}

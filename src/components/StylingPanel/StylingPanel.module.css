@@ -1,11 +1,8 @@
 .stylingPanel {
   position: relative;
-  top: 0px;
-  left: 0px;
   height: 100%;
   display: flex;
   flex-direction: column;
-
   width: 25%;
   background-color: var(--primary-color);
   color: var(--secondary-color);
@@ -16,6 +13,7 @@
 .stylingPanel > div {
   transition: inherit;
   white-space: nowrap;
+  padding: 0 var(--styling-panel-x-margins);
 }
 
 .stylingPanel.closed {
@@ -58,8 +56,7 @@
   opacity: 1;
 }
 
-.stylingPanel > .optionsScroller {
-  /* height: calc(100% - var(--header-height)); */
+.optionsScroller {
   display: flex;
   flex-direction: column;
   gap: 2.5rem;
@@ -67,21 +64,24 @@
   overflow-x: hidden;
   scrollbar-gutter: stable;
   scrollbar-width: thin;
-  padding: 0 var(--styling-panel-x-margins);
+  height: 100%;
 }
 
-.stylingPanel > .optionsScroller > div:last-child {
-  position: sticky;
-  bottom: 0px;
-  z-index: 1;
-  padding: 1rem 0;
+.optionsScroller > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+.stylingPanel > div:last-child {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
   display: flex;
   align-items: center;
-  scrollbar-gutter: stable;
   background-color: var(--primary-color);
 }
 
-.stylingPanel > .optionsScroller > div:last-child > button {
+.stylingPanel > div:last-child > button {
   width: 100%;
   background-color: var(--secondary-color-high-transparency);
   padding: 0.25rem 0;
@@ -90,10 +90,56 @@
   overflow: hidden;
 }
 
-.stylingPanel > .optionsScroller > div:last-child > button:hover {
+.stylingPanel > div:last-child > button:hover {
   background-color: var(--secondary-color-medium-transparency);
 }
 
 .stylingPanel.closed > div {
   padding: 0;
+}
+
+@media (max-width: 1023px) {
+  .stylingPanel {
+    max-height: 50%;
+    flex: 1;
+    width: 100%;
+    padding-top: var(--styling-panel-x-margins);
+  }
+
+  .buttonContainer {
+    top: auto;
+    left: 1rem;
+    /* left: unset; */
+    bottom: 100%;
+    margin-left: 0;
+  }
+
+  .buttonContainer > button > span {
+    text-align: center;
+  }
+
+  .stylingPanel.closed {
+    width: 100%;
+    max-height: 0%;
+  }
+
+  .optionsScroller > div {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--styling-panel-x-margins);
+  }
+
+  .optionsScroller > div > div {
+    width: calc((100% - var(--styling-panel-x-margins)) / 2);
+  }
+}
+
+@media (max-width: 500px) {
+  .optionsScroller > div {
+    flex-direction: column;
+  }
+
+  .optionsScroller > div > div {
+    width: 100%;
+  }
 }

@@ -93,61 +93,6 @@ const TextStyler = () => {
               break;
           }
         })}
-        {/* {textSettings.textConfig.map((input) => {
-          switch (input.type) {
-            case "number":
-              return (
-                <NumericInputSlider
-                  key={input.inputId}
-                  inputId={input.inputId}
-                  inputContainerId={input.inputContainerId}
-                  name={input.name}
-                  label={input.labelText}
-                  icon={input.icon}
-                  value={input.value}
-                  defaultValue={input.defaultValue}
-                  unit={"px"}
-                  minValue={input.minValue}
-                  maxValue={input.maxValue}
-                  range={input.range}
-                  setValue={dispatchRootUpdate}
-                />
-              );
-
-            case "color":
-              return (
-                <ColorInput
-                  key={input.inputId}
-                  inputId={input.inputId}
-                  inputContainerId={input.inputContainerId}
-                  name={input.name}
-                  label={input.labelText}
-                  icon={input.icon}
-                  value={input.value}
-                  defaultValue={input.defaultValue}
-                  setValue={dispatchRootUpdate}
-                />
-              );
-
-            case "select":
-              return (
-                <FontSelector
-                  key={input.inputId}
-                  inputId={input.inputId}
-                  inputContainerId={input.inputContainerId}
-                  name={input.name}
-                  label={input.labelText}
-                  icon={input.icon}
-                  value={input.value}
-                  defaultValue={input.defaultValue}
-                  setValue={dispatchRootUpdate}
-                />
-              );
-
-            default:
-              break;
-          }
-        })} */}
       </div>
     </div>
   );
