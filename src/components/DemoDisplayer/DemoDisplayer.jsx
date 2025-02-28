@@ -53,13 +53,17 @@ const DemoDisplayer = () => {
     const scroller = targetElement.closest('[data-role="scroller"]');
     const demoBox = demoBoxRef.current;
 
+    const targetElementRect = targetElement.getBoundingClientRect();
+
+    const clonedTargetRect = Object.assign({}, targetElementRect.toJSON());
+
     const {
       top: targetTop,
       bottom: targetBottom,
       left: targetLeft,
       right: targetRight,
       height: targetHeight,
-    } = targetElement.getBoundingClientRect();
+    } = targetElementRect;
 
     let newX =
       demoConfig.alignment === "left"
@@ -68,26 +72,25 @@ const DemoDisplayer = () => {
     let newY = targetTop + targetHeight / 2 - demoBox.offsetHeight / 2;
 
     if (scroller) {
-      const { top: scrollerTop = 0, bottom: scrollerBottom = 0 } =
+      const { top: scrollerTop, bottom: scrollerBottom } =
         scroller.getBoundingClientRect();
-      const lastScrollerChild = scroller.lastElementChild;
-
-      const bottomOffset = !lastScrollerChild.contains(targetElement)
-        ? lastScrollerChild.offsetHeight
-        : 0;
 
       const isAboveViewport = targetTop < scrollerTop;
-      const isBelowViewport = targetBottom > scrollerBottom - bottomOffset;
+      const isBelowViewport = targetBottom > scrollerBottom;
 
       if (isAboveViewport) {
         const offset = scrollerTop - targetTop;
         newY += offset;
+        clonedTargetRect.top += offset;
+        clonedTargetRect.bottom += offset;
         scroller.scrollBy({ top: -offset, behavior: "smooth" });
       }
 
       if (isBelowViewport) {
-        const offset = targetBottom - scrollerBottom + bottomOffset;
+        const offset = targetBottom - scrollerBottom;
         newY -= offset;
+        clonedTargetRect.top -= offset;
+        clonedTargetRect.bottom -= offset;
         scroller.scrollBy({ top: offset, behavior: "smooth" });
       }
     }
@@ -96,13 +99,12 @@ const DemoDisplayer = () => {
       width: demoBox.offsetWidth,
       height: demoBox.offsetHeight,
     };
-
     ({ adjustedX: newX, adjustedY: newY } = adjustBoxPosition(
       newX,
       newY,
-      boxSize
+      boxSize,
+      inputData.name === "userText" ? null : clonedTargetRect
     ));
-
     demoBox.style.transform = `translate(${newX}px, ${newY}px)`;
   }, []);
 
@@ -231,7 +233,6 @@ const DemoDisplayer = () => {
 
           case "ArrowLeft":
             if (demoStep > 0) navigateDemoMode(demoStep - 1);
-            else navigateDemoMode(demoPattern.length - 1);
             break;
 
           case "Escape":
@@ -343,12 +344,32 @@ const DemoDisplayer = () => {
 
 export default DemoDisplayer;
 
-const adjustBoxPosition = (x, y, boxSize) => {
-  const adjustedX = Math.max(0, Math.min(x, window.innerWidth - boxSize.width));
-  const adjustedY = Math.max(
-    0,
-    Math.min(y, window.innerHeight - boxSize.height)
-  );
+const adjustBoxPosition = (x, y, boxSize, avoidRect) => {
+  let adjustedX = Math.max(0, Math.min(x, window.innerWidth - boxSize.width));
+  let adjustedY = Math.max(0, Math.min(y, window.innerHeight - boxSize.height));
+
+  if (avoidRect) {
+    const isOverlappingX =
+      (adjustedX >= avoidRect.left && adjustedX < avoidRect.right) ||
+      (avoidRect.left >= adjustedX &&
+        avoidRect.left < adjustedX + boxSize.width);
+
+    if (isOverlappingX) {
+      if (avoidRect.top - boxSize.height < 0) {
+        adjustedY = avoidRect.bottom;
+      } else {
+        adjustedY = avoidRect.top - boxSize.height;
+      }
+
+      adjustedX = Math.max(
+        0,
+        Math.min(
+          avoidRect.left + avoidRect.width / 2 - boxSize.width / 2,
+          window.innerWidth - boxSize.width
+        )
+      );
+    }
+  }
 
   return { adjustedX, adjustedY };
 };

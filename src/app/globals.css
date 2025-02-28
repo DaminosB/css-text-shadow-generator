@@ -272,3 +272,9 @@ label:has(> input[type="color"]) > div {
 .yellow {
   color: var(--yellow);
 }
+
+@media (max-width: 1023px) {
+  header {
+    padding: 0 1rem;
+  }
+}
