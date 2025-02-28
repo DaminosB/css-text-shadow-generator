@@ -60,10 +60,3 @@ span.incremented {
     right: 1rem;
   }
 }
-
-@media (max-width: 500px) {
-  .output {
-    top: 1rem;
-    right: 1rem;
-  }
-}
