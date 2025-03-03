@@ -8,8 +8,10 @@ import { updateRootSettings } from "@/features/textSettings/textSettingsSlice";
 import OutputBox from "../OutputBox/OutputBox";
 
 const TextPreview = () => {
-  const { fontLibrary, highlightedShadow, isDemoMode } =
+  const { fontLibrary, highlightedShadow, modaleContent } =
     useContext(WorkspaceCtxt);
+
+  const isDemoMode = useMemo(() => modaleContent === "demo", [modaleContent]);
 
   const { shadows, textConfig } = useSelector((store) => store.textSettings);
 
