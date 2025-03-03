@@ -109,7 +109,6 @@
   .buttonContainer {
     top: auto;
     left: 1rem;
-    /* left: unset; */
     bottom: 100%;
     margin-left: 0;
   }
@@ -134,7 +133,7 @@
   }
 }
 
-@media (max-width: 500px) {
+@media (max-width: 767px) {
   .optionsScroller > div {
     flex-direction: column;
   }
