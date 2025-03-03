@@ -41,7 +41,7 @@ const OutputBox = () => {
 
           if (!inheritTextColor.value) output += ` ${shadowColor.value}`;
 
-          if (index < array.length - 1) output += ",\n";
+          if (index < array.length - 1) output += ",";
           else output += ";";
 
           return output;
@@ -95,6 +95,7 @@ const OutputBox = () => {
                       className={index > 0 ? styles.incremented : ""}
                     >
                       {string}
+                      <br />
                     </span>
                   );
                 })}

@@ -4,7 +4,6 @@
   top: 5rem;
   right: 5rem;
   color: var(--secondary-color);
-  width: 23rem;
   transition: var(--fast-transition) var(--default-animation);
 }
 
@@ -41,13 +40,16 @@
 .output > div:last-child > pre {
   border-top: 1px solid var(--secondary-color-medium-transparency);
   padding: 0.5rem;
-  /* height: 7rem; */
   max-height: 7rem;
   width: 100%;
   overflow: auto;
   scrollbar-width: thin;
-  /* transition: inherit; */
 }
+
+/* .output > div:last-child code {
+  min-width: 10ch;
+  display: inline-block;
+} */
 
 span.incremented {
   margin-left: 2rem;
@@ -58,5 +60,21 @@ span.incremented {
     top: unset;
     bottom: 1rem;
     right: 1rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .output > div:last-child code {
+    display: inline-flex;
+
+    max-width: 26ch;
+  }
+
+  span.incremented {
+    margin-left: 0;
+  }
+
+  span.incremented::before {
+    content: " ";
   }
 }
