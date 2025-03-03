@@ -1,6 +1,7 @@
 .workspace {
   height: 100%;
   overflow: hidden;
+  position: relative;
 }
 
 .previewWindow {

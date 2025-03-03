@@ -24,20 +24,24 @@ import {
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import parse from "@/utils/parse";
+import Modale from "@/wrappers/Modale/Modale";
 
 const DemoDisplayer = () => {
+  const { modaleContent, setModaleContent } = useContext(WorkspaceCtxt);
+
+  const isDemoMode = useMemo(() => modaleContent === "demo", [modaleContent]);
+
   const [demoStep, setDemoStep] = useState(0);
   const [showConfirmationBox, setShowConfirmationBox] = useState(false);
 
   const textSettings = useSelector((state) => state.textSettings);
-
-  const { isDemoMode, setIsDemoMode } = useContext(WorkspaceCtxt);
 
   const demoPattern = useDemoPattern(textSettings);
 
   const dispatch = useDispatch();
 
   const demoBoxRef = useRef(null);
+  const confirmationBoxRef = useRef(null);
 
   const currentStep = useMemo(
     () => demoPattern[demoStep],
@@ -103,29 +107,28 @@ const DemoDisplayer = () => {
       newX,
       newY,
       boxSize,
-      inputData.name === "userText" ? null : clonedTargetRect
+      clonedTargetRect
     ));
     demoBox.style.transform = `translate(${newX}px, ${newY}px)`;
   }, []);
 
   const toggleDemoMode = useCallback(
     (enable) => {
-      setIsDemoMode(enable);
-
       const focusedContainer = document.getElementById(
         currentStep.inputData.inputContainerId
       );
-
       if (enable) {
+        setModaleContent("demo");
         focusedContainer.classList.add("focused");
         dispatch(replaceState(currentStep.state));
         cachedState.current = textSettings;
       } else {
         focusedContainer.classList.remove("focused");
         dispatch(replaceState(cachedState.current));
+        setModaleContent(null);
       }
     },
-    [currentStep, dispatch, setIsDemoMode, textSettings]
+    [currentStep, dispatch, setModaleContent, textSettings]
   );
 
   const navigateDemoMode = useCallback(
@@ -174,9 +177,8 @@ const DemoDisplayer = () => {
 
   const handleDisplayConfirmationBox = useCallback(
     (e) => {
-      const confirmationBox = Array.from(e.target.children).find((child) =>
-        child.className.includes(styles.confirmationBox)
-      );
+      const confirmationBox = confirmationBoxRef.current;
+
       displayConfirmationBox(e.clientX, e.clientY, confirmationBox);
     },
     [displayConfirmationBox]
@@ -199,6 +201,8 @@ const DemoDisplayer = () => {
   );
 
   useEffect(() => {
+    if (!isDemoMode) return;
+
     posDemoBox(currentStep);
 
     const controller = new AbortController();
@@ -207,16 +211,9 @@ const DemoDisplayer = () => {
     window.addEventListener(
       "keydown",
       (e) => {
-        if (!isDemoMode) return;
+        demoBoxRef.current.focus();
 
-        const demoDisplayer = document.querySelector(
-          `.${styles.demoDisplayer}`
-        );
-        demoDisplayer.focus();
-
-        const confirmationBox = document.querySelector(
-          `.${styles.confirmationBox}`
-        );
+        const confirmationBox = confirmationBoxRef.current;
 
         switch (e.code) {
           case "ArrowRight":
@@ -274,31 +271,18 @@ const DemoDisplayer = () => {
     posDemoBox,
   ]);
 
-  const demoDisplayerClasses = useMemo(
-    () =>
-      `${styles.demoDisplayer} ${isDemoMode ? styles.open : ""} ${
-        showConfirmationBox ? styles.darker : ""
-      }`,
-    [isDemoMode, showConfirmationBox]
-  );
-
   return (
     <>
-      <button
-        className={styles.toogleButton}
-        onClick={() => toggleDemoMode(!isDemoMode)}
-      >
-        <FontAwesomeIcon icon={faQuestion} />
-      </button>
-      <div
-        className={demoDisplayerClasses}
+      <Modale
+        darkBackground={showConfirmationBox}
         onClick={handleDisplayConfirmationBox}
-        tabIndex={0}
+        isOpen={isDemoMode}
       >
         <div
           className={`${styles.confirmationBox} ${
             showConfirmationBox ? "" : "hidden"
           } focused`}
+          ref={confirmationBoxRef}
           onClick={(e) => e.stopPropagation()}
         >
           <div>
@@ -337,7 +321,7 @@ const DemoDisplayer = () => {
             </div>
           </div>
         </div>
-      </div>
+      </Modale>
     </>
   );
 };

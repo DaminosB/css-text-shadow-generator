@@ -13,10 +13,13 @@ import TextPreview from "../TextPreview/TextPreview";
 import StylingPanel from "../StylingPanel/StylingPanel";
 
 import DemoDisplayer from "../DemoDisplayer/DemoDisplayer";
+import UtilityButtons from "../UtilityButtons/UtilityButtons";
+import About from "../About/About";
 
 const Workspace = ({ fontLibrary }) => {
   const [highlightedShadow, setHighlightedShadow] = useState(null);
-  const [isDemoMode, setIsDemoMode] = useState(false);
+
+  const [modaleContent, setModaleContent] = useState(null);
 
   const highlightShadow = (indexToHighlight) => {
     setHighlightedShadow(indexToHighlight);
@@ -26,8 +29,8 @@ const Workspace = ({ fontLibrary }) => {
     fontLibrary,
     highlightShadow,
     highlightedShadow,
-    isDemoMode,
-    setIsDemoMode,
+    modaleContent,
+    setModaleContent,
   };
 
   return (
@@ -38,7 +41,9 @@ const Workspace = ({ fontLibrary }) => {
             <StylingPanel />
             <TextPreview />
           </div>
+          <UtilityButtons />
           <DemoDisplayer />
+          <About />
         </div>
       </WorkspaceCtxt.Provider>
     </Provider>

@@ -1,4 +1,4 @@
-.toogleButton {
+/* .toogleButton {
   font-size: 2rem;
   padding: 1.5rem;
   position: absolute;
@@ -22,22 +22,23 @@
   visibility: hidden;
   opacity: 0;
   color: var(--secondary-color);
-}
-
-.demoDisplayer.open {
-  opacity: 1;
-  visibility: visible;
-}
-
-.demoDisplayer.darker {
-  background-color: var(--primary-color-high-transparency);
-}
+  }
+  
+  .demoDisplayer.open {
+    opacity: 1;
+    visibility: visible;
+    }
+    
+    .demoDisplayer.darker {
+      background-color: var(--primary-color-high-transparency);
+      } */
 
 .confirmationBox {
   position: absolute;
   padding: 1rem;
   background-color: var(--primary-color);
   z-index: 1;
+  color: var(--secondary-color);
   transition: var(--fast-transition) var(--default-animation);
 }
 
@@ -67,6 +68,7 @@ div:has(> .demoBox) {
 }
 
 .demoBox {
+  color: var(--secondary-color);
   position: relative;
   background-color: var(--primary-color);
   border: var(--default-border);
