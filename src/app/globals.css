@@ -4,6 +4,7 @@
   --fast-transition: 250ms;
   --average-transition: 500ms;
   --default-animation: ease-in-out;
+  --fade-in-animation: fade-in var(--fast-transition);
 
   --primary-color: #262626;
   --primary-color-high-transparency: #2626263f;
@@ -276,5 +277,16 @@ label:has(> input[type="color"]) > div {
 @media (max-width: 1023px) {
   header {
     padding: 0 1rem;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
