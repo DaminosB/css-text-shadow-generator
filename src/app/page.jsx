@@ -7,22 +7,16 @@ import Workspace from "@/components/Workspace/Workspace";
 export default function Home() {
   const { fontLibrary } = useGoogleFonts();
 
-  const getFontFamily = (label) =>
-    fontLibrary.find((font) => font.label === label)?.instance.style.fontFamily;
-
-  const manropeFontFamily = getFontFamily("Manrope");
-  const cutiveMonoFontFamily = getFontFamily("Cutive Mono");
-
   return (
     <>
       <head>
         <style>
           {`
             html {
-              font-family: ${manropeFontFamily};
+              font-family: ${fontLibrary.manrope.style.fontFamily};
             }
             pre {
-              font-family: ${cutiveMonoFontFamily};
+              font-family: ${fontLibrary.cutiveMono.style.fontFamily};
             }
           `}
         </style>

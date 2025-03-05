@@ -1,6 +1,6 @@
 import styles from "./TextStyler.module.css";
 
-import { useContext, useState } from "react";
+import { useContext, useState, useMemo } from "react";
 import { WorkspaceCtxt } from "@/components/Workspace/Workspace";
 
 import { useSelector, useDispatch } from "react-redux";
@@ -11,10 +11,12 @@ import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
 
 import NumericInputSlider from "@/inputs/NumericInputSlider/NumericInputSlider";
 import ColorInput from "@/inputs/ColorInput/ColorInput";
-import FontSelector from "@/inputs/FontSelector/FontSelector";
+import SelectInput from "@/inputs/SelectInput/SelectInput";
 
 const TextStyler = () => {
   const [showContent, setShowContent] = useState(true);
+
+  const { fontLibrary } = useContext(WorkspaceCtxt);
 
   const textSettings = useSelector((store) => store.textSettings);
 
@@ -27,6 +29,15 @@ const TextStyler = () => {
   const dispatchRootUpdate = (newKey) => {
     dispatch(updateRootSettings(newKey));
   };
+
+  const selectionLists = useMemo(
+    () => ({
+      fontLibrary: Object.entries(fontLibrary).map(([fontLabel, font]) => {
+        return { ...font, label: fontLabel };
+      }),
+    }),
+    []
+  );
 
   return (
     <div className={`${styles.textStyler} ${showContent ? "" : styles.closed}`}>
@@ -75,8 +86,12 @@ const TextStyler = () => {
               );
 
             case "select":
+              const list = selectionLists[config.listName];
+
+              if (!list) return;
+
               return (
-                <FontSelector
+                <SelectInput
                   key={config.inputId}
                   inputId={config.inputId}
                   inputContainerId={config.inputContainerId}
@@ -84,6 +99,7 @@ const TextStyler = () => {
                   label={config.labelText}
                   icon={config.icon}
                   value={config.value}
+                  list={list}
                   defaultValue={config.defaultValue}
                   setValue={dispatchRootUpdate}
                 />

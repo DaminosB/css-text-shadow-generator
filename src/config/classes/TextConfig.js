@@ -37,10 +37,11 @@ export default class TextConfig {
     },
     {
       name: "textFont",
-      value: "Montserrat",
+      value: "montserrat",
       labelText: "text font",
       icon: faFont,
       type: "select",
+      listName: "fontLibrary",
     },
   ];
 

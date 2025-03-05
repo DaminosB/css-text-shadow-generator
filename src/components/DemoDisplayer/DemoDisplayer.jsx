@@ -20,11 +20,12 @@ import {
   faCheck,
   faChevronLeft,
   faChevronRight,
-  faQuestion,
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
-import parse from "@/utils/parse";
+
 import Modale from "@/wrappers/Modale/Modale";
+
+import parse from "@/utils/parse";
 
 const DemoDisplayer = () => {
   const { modaleContent, setModaleContent } = useContext(WorkspaceCtxt);
@@ -112,24 +113,15 @@ const DemoDisplayer = () => {
     demoBox.style.transform = `translate(${newX}px, ${newY}px)`;
   }, []);
 
-  const toggleDemoMode = useCallback(
-    (enable) => {
-      const focusedContainer = document.getElementById(
-        currentStep.inputData.inputContainerId
-      );
-      if (enable) {
-        setModaleContent("demo");
-        focusedContainer.classList.add("focused");
-        dispatch(replaceState(currentStep.state));
-        cachedState.current = textSettings;
-      } else {
-        focusedContainer.classList.remove("focused");
-        dispatch(replaceState(cachedState.current));
-        setModaleContent(null);
-      }
-    },
-    [currentStep, dispatch, setModaleContent, textSettings]
-  );
+  const closeDemoMode = useCallback(() => {
+    const focusedContainer = document.getElementById(
+      currentStep.inputData.inputContainerId
+    );
+
+    focusedContainer.classList.remove("focused");
+    dispatch(replaceState(cachedState.current));
+    setModaleContent(null);
+  }, [currentStep, dispatch, setModaleContent, textSettings]);
 
   const navigateDemoMode = useCallback(
     (newIndex) => {
@@ -195,15 +187,16 @@ const DemoDisplayer = () => {
   const handleConfirmationBoxClick = useCallback(
     (e) => {
       setShowConfirmationBox(false);
-      if (parse(e.currentTarget.value)) toggleDemoMode(false);
+      if (parse(e.currentTarget.value)) closeDemoMode();
     },
-    [setShowConfirmationBox, toggleDemoMode]
+    [setShowConfirmationBox, closeDemoMode]
   );
 
   useEffect(() => {
     if (!isDemoMode) return;
 
     posDemoBox(currentStep);
+    dispatch(replaceState(currentStep.state));
 
     const controller = new AbortController();
     const { signal } = controller;
@@ -247,7 +240,7 @@ const DemoDisplayer = () => {
           case "Enter":
             if (showConfirmationBox) {
               setShowConfirmationBox(false);
-              toggleDemoMode(false);
+              closeDemoMode();
             }
             break;
 
@@ -266,7 +259,7 @@ const DemoDisplayer = () => {
     currentStep,
     demoPattern,
     displayConfirmationBox,
-    toggleDemoMode,
+    closeDemoMode,
     navigateDemoMode,
     posDemoBox,
   ]);
@@ -299,7 +292,7 @@ const DemoDisplayer = () => {
         </div>
         <div ref={demoBoxRef} onClick={handleDemoWindowClick}>
           <div className={`${styles.demoBox} focused`}>
-            <button onClick={() => toggleDemoMode(false)}>
+            <button onClick={() => closeDemoMode()}>
               <FontAwesomeIcon icon={faXmark} />
             </button>
             <p>{demoStep !== null && currentStep.demoConfig.text}</p>

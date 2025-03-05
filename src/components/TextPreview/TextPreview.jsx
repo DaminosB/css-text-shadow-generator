@@ -23,8 +23,7 @@ const TextPreview = () => {
 
   const textStyle = useMemo(
     () => ({
-      ...fontLibrary.find((font) => font.label === textConfig.textFont.value)
-        .instance.style,
+      ...fontLibrary[textConfig.textFont.value].style,
       fontSize: `${textConfig.fontSize.value}px`,
       color: textConfig.textColor.value,
       backgroundColor: textConfig.backgroundColor.value,

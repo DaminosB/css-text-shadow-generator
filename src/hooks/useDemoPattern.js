@@ -24,7 +24,7 @@ const useDemoPattern = (initialState) => {
         alignment: "right",
         text: "Make your letters pop",
       })
-      .addValueChangeStep("textFont", ["textConfig"], "Comfortaa", {
+      .addValueChangeStep("textFont", ["textConfig"], "comfortaa", {
         alignment: "right",
         text: "Choose a fresh font",
       })

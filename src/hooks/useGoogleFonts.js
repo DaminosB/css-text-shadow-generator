@@ -1,3 +1,4 @@
+import getFontLabelAndName from "@/utils/getFontLabelAndName";
 import {
   Inter,
   Dancing_Script,
@@ -30,54 +31,32 @@ import {
   Courier_Prime,
 } from "next/font/google";
 
-import { useMemo } from "react";
-
 const useGoogleFonts = () => {
-  const fontLibrary = Object.entries(fontConfigs)
-    .flatMap(([type, fonts]) =>
-      fonts.map((instance) => {
-        const cleanedFontLabel = instance.style.fontFamily
-          .split(",")[0]
-          .replaceAll("'", "")
-          .trim();
-
-        return {
-          label: cleanedFontLabel,
-          id: cleanedFontLabel.replaceAll(" ", "-"),
-          instance,
-          type,
-        };
-      })
-    )
-    .sort((a, b) => (a.label > b.label ? 1 : -1));
+  const fontLibrary = Object.entries(fontConfigs).reduce(
+    (acc, [type, fonts]) => {
+      return {
+        ...acc,
+        ...fonts.reduce((subAcc, font) => {
+          const { fontName, fontLabel } = getFontLabelAndName(
+            font.style.fontFamily
+          );
+          return {
+            ...subAcc,
+            [fontLabel]: {
+              ...font,
+              type,
+              name: fontName,
+              id: crypto.randomUUID(),
+            },
+          };
+        }, {}),
+      };
+    },
+    {}
+  );
 
   return { fontLibrary };
 };
-// const useGoogleFonts = () => {
-//   const fontLibrary = useMemo(
-//     () =>
-//       Object.entries(fontConfigs)
-//         .flatMap(([type, fonts]) =>
-//           fonts.map((instance) => {
-//             const cleanedFontLabel = instance.style.fontFamily
-//               .split(",")[0]
-//               .replaceAll("'", "")
-//               .trim();
-
-//             return {
-//               label: cleanedFontLabel,
-//               id: cleanedFontLabel.replaceAll(" ", "-"),
-//               instance,
-//               type,
-//             };
-//           })
-//         )
-//         .sort((a, b) => (a.label > b.label ? 1 : -1)),
-//     []
-//   );
-
-//   return { fontLibrary };
-// };
 
 const inter = Inter({ subsets: ["latin"], display: "swap" });
 const dancingScript = Dancing_Script({ subsets: ["latin"], display: "swap" });
