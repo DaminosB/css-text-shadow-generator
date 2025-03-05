@@ -11,11 +11,20 @@ const CheckboxButton = ({
   onClick,
   value,
   text,
+  isDimmed = false,
+  disabled = false,
 }) => {
   return (
     <InputFrame inputId={inputId} inputContainerId={inputContainerId}>
       <div className={styles.checkbox}>
-        <button id={inputId} name={name} onClick={onClick} value={value}>
+        <button
+          id={inputId}
+          className={isDimmed ? "ethereal" : ""}
+          name={name}
+          onClick={onClick}
+          value={value}
+          disabled={disabled}
+        >
           <FontAwesomeIcon icon={value ? faSquareCheck : faSquare} />
         </button>
         <span>{text}</span>

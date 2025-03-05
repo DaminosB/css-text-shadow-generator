@@ -8,4 +8,5 @@
 
 .checkbox > button {
   font-size: 1.25rem;
+  transition: var(--fast-transition) var(--default-animation);
 }
