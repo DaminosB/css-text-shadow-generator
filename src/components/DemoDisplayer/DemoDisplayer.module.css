@@ -1,38 +1,3 @@
-/* .toogleButton {
-  font-size: 2rem;
-  padding: 1.5rem;
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  z-index: 2;
-  color: var(--secondary-color);
-  filter: var(--icon-shadow);
-}
-
-.demoDisplayer {
-  position: absolute;
-  inset: 0px;
-  z-index: 1;
-  transition: var(--fast-transition) var(--default-animation);
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  visibility: hidden;
-  opacity: 0;
-  color: var(--secondary-color);
-  }
-  
-  .demoDisplayer.open {
-    opacity: 1;
-    visibility: visible;
-    }
-    
-    .demoDisplayer.darker {
-      background-color: var(--primary-color-high-transparency);
-      } */
-
 .confirmationBox {
   position: absolute;
   padding: 1rem;
@@ -45,7 +10,6 @@
 .confirmationBox > div:last-of-type {
   margin-top: 1rem;
   display: flex;
-  /* justify-content: space-around; */
   gap: 1rem;
 }
 
