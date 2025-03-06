@@ -33,6 +33,8 @@ div:has(> div.inputContainer) {
   position: relative;
   align-content: center;
   transition: var(--fast-transition) var(--default-animation);
+  touch-action: none;
+  cursor: pointer;
 }
 
 .sliderContainer > button {

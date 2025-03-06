@@ -126,6 +126,7 @@ const NumericInputSlider = ({
         }`}
         title={isOutOfRange ? "The value is out of range" : ""}
         onPointerMove={updateValue}
+        onClick={updateValue}
       >
         <button
           ref={knobRef}
@@ -133,7 +134,7 @@ const NumericInputSlider = ({
           onPointerDown={handleGrabbingEvents}
           onPointerUp={handleGrabbingEvents}
         ></button>
-        <div className={styles.track} onClick={updateValue}></div>
+        <div className={styles.track}></div>
       </div>
     </InputFrame>
   );
