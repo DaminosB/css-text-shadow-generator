@@ -1,7 +1,6 @@
 .shadowStyler {
   max-height: 100%;
   position: relative;
-  /* transition: var(--average-transition) var(--default-animation); */
   border: var(--default-border);
   width: 100%;
   background-color: var(--primary-color);
@@ -23,16 +22,19 @@
   visibility: visible;
 }
 
-/* .shadowStyler > div {
-  position: relative;
-  border: var(--default-border);
-  } */
-
 .titleBlock {
   display: flex;
   justify-content: space-between;
   padding: 0.5rem;
   touch-action: none;
+}
+
+.titleBlock > button:not(:disabled) {
+  cursor: grab;
+
+  &:active {
+    cursor: grabbing;
+  }
 }
 
 .shadowStyler.hidden {
