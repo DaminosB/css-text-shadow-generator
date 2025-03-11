@@ -1,17 +1,17 @@
 .shadowStyler {
   max-height: 100%;
   position: relative;
-  transition: var(--average-transition) var(--default-animation);
-}
-
-.shadowStyler h2 {
-  padding: 0.5rem;
+  /* transition: var(--average-transition) var(--default-animation); */
+  border: var(--default-border);
+  width: 100%;
+  background-color: var(--primary-color);
+  transition: var(--fast-transition) var(--default-animation);
 }
 
 .inactiveMask {
   position: absolute;
   inset: 0px;
-  background-color: var(--secondary-color-medium-transparency);
+  background-color: var(--secondary-color-high-transparency);
   z-index: 1;
   opacity: 0;
   visibility: hidden;
@@ -23,9 +23,16 @@
   visibility: visible;
 }
 
-.shadowStyler > div {
+/* .shadowStyler > div {
   position: relative;
   border: var(--default-border);
+  } */
+
+.titleBlock {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem;
+  touch-action: none;
 }
 
 .shadowStyler.hidden {

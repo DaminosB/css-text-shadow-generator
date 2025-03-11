@@ -45,15 +45,12 @@
   display: inline-block;
   opacity: 0;
   transition: var(--fast-transition) var(--default-animation);
-}
-
-.buttonContainer > button > span {
   filter: var(--icon-shadow);
-}
 
-.buttonContainer > button > span.active {
-  z-index: 1;
-  opacity: 1;
+  &.active {
+    z-index: 1;
+    opacity: 1;
+  }
 }
 
 .optionsScroller {
@@ -65,12 +62,17 @@
   scrollbar-gutter: stable;
   scrollbar-width: thin;
   height: 100%;
+
+  &.unscrollable {
+    overflow: hidden;
+  }
 }
 
-.optionsScroller > div {
+.optionsScroller > div:first-of-type {
   display: flex;
   flex-direction: column;
   gap: 2.5rem;
+  position: relative;
 }
 
 .stylingPanel > div:last-child {
@@ -98,6 +100,17 @@
   padding: 0;
 }
 
+.dragWitness {
+  position: absolute;
+  width: calc(100% - (var(--styling-panel-x-margins) * 2));
+  background-color: var(--primary-color);
+  box-shadow: 0px 0px 5px 3px var(--secondary-color);
+  z-index: 10;
+  padding: 0.5rem;
+  opacity: 0.75;
+  z-index: 10;
+}
+
 @media (max-width: 1023px) {
   .stylingPanel {
     max-height: 50%;
@@ -122,23 +135,23 @@
     max-height: 0%;
   }
 
-  .optionsScroller > div {
+  .optionsScroller > div:first-of-type {
     flex-direction: row;
     flex-wrap: wrap;
     gap: var(--styling-panel-x-margins);
   }
 
-  .optionsScroller > div > div {
+  .optionsScroller > div:first-of-type > div {
     width: calc((100% - var(--styling-panel-x-margins)) / 2);
   }
 }
 
 @media (max-width: 767px) {
-  .optionsScroller > div {
+  .optionsScroller > div:first-of-type {
     flex-direction: column;
   }
 
-  .optionsScroller > div > div {
+  .optionsScroller > div:first-of-type > div {
     width: 100%;
   }
 }

@@ -1,8 +1,6 @@
 import styles from "./ShadowStyler.module.css";
 
-import { useState } from "react";
-
-import { useContext, useMemo, useRef } from "react";
+import { useContext, useMemo, useRef, useState } from "react";
 import { WorkspaceCtxt } from "../Workspace/Workspace";
 
 import { useSelector, useDispatch } from "react-redux";
@@ -18,7 +16,10 @@ import {
   faSun,
   faTrashCan,
 } from "@fortawesome/free-regular-svg-icons";
-import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
+import {
+  faChevronDown,
+  faGripVertical,
+} from "@fortawesome/free-solid-svg-icons";
 
 import NumericInputSlider from "@/inputs/NumericInputSlider/NumericInputSlider";
 import ColorInput from "@/inputs/ColorInput/ColorInput";
@@ -26,7 +27,7 @@ import CheckboxButton from "@/inputs/CheckboxButton/CheckboxButton";
 
 import parse from "@/utils/parse";
 
-const ShadowStyler = ({ shadow, index }) => {
+const ShadowStyler = ({ shadow, index, startDragging }) => {
   const textSettings = useSelector((store) => store.textSettings);
 
   const { shadows } = textSettings;
@@ -97,9 +98,7 @@ const ShadowStyler = ({ shadow, index }) => {
   };
 
   const handleHighlight = (e) => {
-    // if (isVisibleInput.value) {
     if (shadow.inputs.isVisible.value) {
-      // if (isVisible) {
       switch (e.type) {
         case "pointerenter":
           highlightShadow(index);
@@ -122,7 +121,7 @@ const ShadowStyler = ({ shadow, index }) => {
   const unMountComponent = () => {
     if (shouldUnmount.current) {
       dispatch(removeShadow(shadow.id));
-      shouldUnmount.current = false;
+      // shouldUnmount.current = false;
     }
   };
 
@@ -142,13 +141,20 @@ const ShadowStyler = ({ shadow, index }) => {
 
   return (
     <div
+      id={shadow.id}
       className={containerClasses}
       ref={stylerRef}
-      onTransitionEnd={shouldUnmount.current ? unMountComponent : null}
+      onTransitionEnd={unMountComponent}
+      data-role="draggable-container"
     >
-      <div id={shadow.id}>
-        <div className={styles.inactiveMask}></div>
-        <h2>Layer {index + 1}</h2>
+      <div className={styles.inactiveMask}></div>
+      <div data-role="drag-witness">
+        <div className={styles.titleBlock}>
+          <h2>#{index + 1}</h2>
+          <button onPointerDown={startDragging} disabled={shadows.length === 1}>
+            <FontAwesomeIcon icon={faGripVertical} />
+          </button>
+        </div>
         <p className={styles.infoText}>{infoText}</p>
         <div className={styles.toolsContainer}>
           <button
@@ -187,58 +193,58 @@ const ShadowStyler = ({ shadow, index }) => {
             <FontAwesomeIcon icon={faChevronDown} />
           </button>
         </div>
-        <div className={styles.inputContainer}>
-          {columnedInputs.map((input) => {
-            const [inputName, config] = input;
-            switch (config.type) {
-              case "number":
-                return (
-                  <NumericInputSlider
-                    key={config.inputId}
+      </div>
+      <div className={styles.inputContainer}>
+        {columnedInputs.map((input) => {
+          const [inputName, config] = input;
+          switch (config.type) {
+            case "number":
+              return (
+                <NumericInputSlider
+                  key={config.inputId}
+                  inputId={config.inputId}
+                  name={inputName}
+                  label={config.labeltext}
+                  inputContainerId={config.inputContainerId}
+                  icon={config.icon}
+                  range={config.range}
+                  minValue={config.minValue}
+                  maxValue={config.maxValue}
+                  defaultValue={config.defaultValue}
+                  value={config.value}
+                  unit="px"
+                  setValue={handleUpdateShadow}
+                />
+              );
+
+            case "color":
+              const overrideInput = shadow.inputs[config.depedency];
+
+              return (
+                <div key={config.inputId} className={styles.colorSelection}>
+                  <ColorInput
                     inputId={config.inputId}
+                    inputContainerId={config.inputContainerId}
                     name={inputName}
                     label={config.labeltext}
-                    inputContainerId={config.inputContainerId}
                     icon={config.icon}
-                    range={config.range}
-                    minValue={config.minValue}
-                    maxValue={config.maxValue}
                     defaultValue={config.defaultValue}
                     value={config.value}
-                    unit="px"
                     setValue={handleUpdateShadow}
+                    disabled={overrideInput.value}
                   />
-                );
-
-              case "color":
-                const overrideInput = shadow.inputs[config.depedency];
-
-                return (
-                  <div key={config.inputId} className={styles.colorSelection}>
-                    <ColorInput
-                      inputId={config.inputId}
-                      inputContainerId={config.inputContainerId}
-                      name={inputName}
-                      label={config.labeltext}
-                      icon={config.icon}
-                      defaultValue={config.defaultValue}
-                      value={config.value}
-                      setValue={handleUpdateShadow}
-                      disabled={overrideInput.value}
-                    />
-                    <CheckboxButton
-                      inputId={overrideInput.inputId}
-                      inputContainerId={overrideInput.inputContainerId}
-                      name={overrideInput.name}
-                      onClick={toggleProperty}
-                      value={overrideInput.value}
-                      text={overrideInput.labelText}
-                    />
-                  </div>
-                );
-            }
-          })}
-        </div>
+                  <CheckboxButton
+                    inputId={overrideInput.inputId}
+                    inputContainerId={overrideInput.inputContainerId}
+                    name={overrideInput.name}
+                    onClick={toggleProperty}
+                    value={overrideInput.value}
+                    text={overrideInput.labelText}
+                  />
+                </div>
+              );
+          }
+        })}
       </div>
     </div>
   );
