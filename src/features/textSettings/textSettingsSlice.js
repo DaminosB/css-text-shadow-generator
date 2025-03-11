@@ -34,6 +34,16 @@ const textSettingsSlice = createSlice({
         );
       }
     },
+    moveShadow: (state, action) => {
+      const { id, newIndex } = action.payload;
+
+      const shadowIndex = state.shadows.findIndex((shadow) => shadow.id === id);
+      if (shadowIndex === -1) return;
+
+      const [shadow] = state.shadows.splice(shadowIndex, 1);
+
+      state.shadows.splice(newIndex, 0, shadow);
+    },
   },
 });
 
@@ -43,6 +53,7 @@ export const {
   addShadow,
   updateShadow,
   removeShadow,
+  moveShadow,
 } = textSettingsSlice.actions;
 
 export default textSettingsSlice.reducer;
