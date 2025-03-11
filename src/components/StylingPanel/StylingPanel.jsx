@@ -74,9 +74,14 @@ const StylingPanel = () => {
       let dragValue = containerRect.top - scroller.getBoundingClientRect().top;
       dragWitness.style.transform = `translateY(${dragValue}px)`;
 
+      const scrollerRelativeTop =
+        scroller.getBoundingClientRect().top - scroller.offsetTop;
+
       // Adjust dropZone position to align with the dragged element
       let dropZoneOffset =
-        containerRect.top - shadowHeaders[currentIndex].offsetTop;
+        containerRect.top -
+        shadowHeaders[currentIndex].offsetTop -
+        scrollerRelativeTop;
       dropZone.style.transform = `translateY(${dropZoneOffset}px)`;
 
       const shadowHeadersPositions = shadowHeaders.map((header) => ({
@@ -100,7 +105,8 @@ const StylingPanel = () => {
         cachedYPosition = pointerMoveEvent.clientY;
 
         // Determine the new layer position based on pointer location
-        const cursorY = pointerMoveEvent.clientY - dropZoneOffset;
+        const cursorY =
+          pointerMoveEvent.clientY - dropZoneOffset - scrollerRelativeTop;
 
         // Detect if the cursor is near the top or bottom of the visible container
         const scrollerRect = scroller.getBoundingClientRect();
