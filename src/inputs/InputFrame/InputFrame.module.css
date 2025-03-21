@@ -1,5 +1,5 @@
 .inputFrame {
-  /* padding: 0.5rem; */
+  overflow: hidden;
   transition: box-shadow var(--fast-transition) var(--default-animation);
 }
 

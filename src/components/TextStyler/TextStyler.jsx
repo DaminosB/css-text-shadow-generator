@@ -1,113 +1,61 @@
 import styles from "./TextStyler.module.css";
 
-import { useContext, useState, useMemo } from "react";
-import { WorkspaceCtxt } from "@/components/Workspace/Workspace";
+import { useState, useMemo } from "react";
 
 import { useSelector, useDispatch } from "react-redux";
-import { updateRootSettings } from "@/features/textSettings/textSettingsSlice";
+import { updateSetting } from "@/features/textSettings/textSettingsSlice";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
+import InputDisplayer from "@/inputs/InputDisplayer/InputDisplayer";
+import SmartButton from "@/inputs/SmartButton/SmartButton";
 
-import NumericInputSlider from "@/inputs/NumericInputSlider/NumericInputSlider";
-import ColorInput from "@/inputs/ColorInput/ColorInput";
-import SelectInput from "@/inputs/SelectInput/SelectInput";
+import parse from "@/utils/parse";
 
-const TextStyler = () => {
-  const [showContent, setShowContent] = useState(true);
+const TextStyler = ({ path }) => {
+  const { textConfig } = useSelector((store) => store.textSettings);
 
-  const { fontLibrary } = useContext(WorkspaceCtxt);
-
-  const textSettings = useSelector((store) => store.textSettings);
-
-  const toggleShowContent = () => {
-    setShowContent((prev) => !prev);
-  };
+  const toggleButton = useMemo(() => textConfig.controls.open, [textConfig]);
 
   const dispatch = useDispatch();
 
-  const dispatchRootUpdate = (newKey) => {
-    dispatch(updateRootSettings(newKey));
+  const toggleShowContent = (e) => {
+    const buttonName = e.currentTarget.name;
+    const buttonValue = !parse(e.currentTarget.value);
+    const controlPath = [...path, "controls", buttonName, "config"];
+
+    dispatch(
+      updateSetting({ path: controlPath, key: "value", value: buttonValue })
+    );
   };
 
-  const selectionLists = useMemo(
-    () => ({
-      fontLibrary: Object.entries(fontLibrary).map(([fontLabel, font]) => {
-        return { ...font, label: fontLabel };
-      }),
-    }),
-    []
-  );
-
   return (
-    <div className={`${styles.textStyler} ${showContent ? "" : styles.closed}`}>
+    <div
+      className={`${styles.textStyler} ${
+        toggleButton.config.value ? "" : styles.closed
+      }`}
+    >
       <div>
         <h2>text style</h2>
-        <button onClick={toggleShowContent}>
-          <FontAwesomeIcon icon={faChevronDown} />
-        </button>
+        <SmartButton
+          key={toggleButton.id}
+          inputId={toggleButton.id}
+          name={toggleButton.config.name}
+          inputContainerId={`container-${toggleButton.id}`}
+          icon={toggleButton.config.icon}
+          icons={toggleButton.config.icons}
+          onClick={toggleShowContent}
+          value={toggleButton.config.value}
+        />
       </div>
       <div>
-        {Object.entries(textSettings.textConfig).map((input) => {
-          const [inputName, config] = input;
-          switch (config.type) {
-            case "number":
-              return (
-                <NumericInputSlider
-                  key={config.inputId}
-                  inputId={config.inputId}
-                  inputContainerId={config.inputContainerId}
-                  name={inputName}
-                  label={config.labelText}
-                  icon={config.icon}
-                  value={config.value}
-                  defaultValue={config.defaultValue}
-                  unit={"px"}
-                  minValue={config.minValue}
-                  maxValue={config.maxValue}
-                  range={config.range}
-                  setValue={dispatchRootUpdate}
-                />
-              );
-
-            case "color":
-              return (
-                <ColorInput
-                  key={config.inputId}
-                  inputId={config.inputId}
-                  inputContainerId={config.inputContainerId}
-                  name={inputName}
-                  label={config.labelText}
-                  icon={config.icon}
-                  value={config.value}
-                  defaultValue={config.defaultValue}
-                  setValue={dispatchRootUpdate}
-                />
-              );
-
-            case "select":
-              const list = selectionLists[config.listName];
-
-              if (!list) return;
-
-              return (
-                <SelectInput
-                  key={config.inputId}
-                  inputId={config.inputId}
-                  inputContainerId={config.inputContainerId}
-                  name={inputName}
-                  label={config.labelText}
-                  icon={config.icon}
-                  value={config.value}
-                  list={list}
-                  defaultValue={config.defaultValue}
-                  setValue={dispatchRootUpdate}
-                />
-              );
-
-            default:
-              break;
-          }
+        {Object.entries(textConfig.inputs).map(([inputName, config]) => {
+          const inputPath = [...path, "inputs", inputName];
+          return (
+            <InputDisplayer
+              key={config.inputId}
+              config={config}
+              path={inputPath}
+            />
+          );
         })}
       </div>
     </div>

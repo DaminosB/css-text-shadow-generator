@@ -40,7 +40,6 @@ div:has(> div.inputContainer) {
 .sliderContainer > button {
   position: absolute;
   top: 50%;
-  transform-box: fill-box;
   transform: translate(0, -50%);
   height: 100%;
   aspect-ratio: 1;

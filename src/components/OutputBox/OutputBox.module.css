@@ -46,10 +46,12 @@
   scrollbar-width: thin;
 }
 
-/* .output > div:last-child code {
-  min-width: 10ch;
-  display: inline-block;
-} */
+.output
+  > div:last-child
+  > pre
+  span:not(:first-of-type):not(:last-of-type)::after {
+  content: "\A";
+}
 
 span.incremented {
   margin-left: 2rem;

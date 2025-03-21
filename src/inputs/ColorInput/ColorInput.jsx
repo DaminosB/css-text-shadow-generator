@@ -13,24 +13,20 @@ const ColorInput = ({
   inputContainerId,
   icon,
   value,
-  defaultValue,
   setValue,
+  defaultValue,
   disabled,
 }) => {
   const handleOnChange = (e) => {
-    setValue({ key: e.target.name, value: e.target.value.toUpperCase() });
-    // setValue({ [e.target.name]: e.target.value.toUpperCase() });
+    setValue(e.target.value.toUpperCase());
   };
 
   const previewStyle = useMemo(() => ({ backgroundColor: value }), [value]);
 
   const handleOnBlur = (e) => {
     const matchesPattern = stringRegex.test(e.target.value);
-    if (matchesPattern)
-      setValue({ key: e.target.name, value: e.target.value.toUpperCase() });
-    // setValue({ [e.target.name]: e.target.value.toUpperCase() });
-    else setValue({ key: e.target.name, value: defaultValue });
-    // else setValue({ [e.target.name]: defaultValue });
+    if (matchesPattern) setValue(e.target.value.toUpperCase());
+    else setValue(defaultValue);
   };
 
   return (
@@ -39,12 +35,7 @@ const ColorInput = ({
       inputContainerId={inputContainerId}
       label={label}
     >
-      <div
-        className={`${styles.inputContainer} ${
-          disabled ? styles.disabled : ""
-        }`}
-      >
-        {/* <div className={disabled ? "" : "hidden"}></div> */}
+      <div className={styles.inputContainer}>
         <div>
           <FontAwesomeIcon icon={icon} />
         </div>

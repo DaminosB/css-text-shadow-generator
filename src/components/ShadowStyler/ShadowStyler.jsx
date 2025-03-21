@@ -1,33 +1,18 @@
 import styles from "./ShadowStyler.module.css";
 
-import { useContext, useMemo, useRef, useState } from "react";
+import { useContext, useMemo, useRef, useState, useCallback } from "react";
 import { WorkspaceCtxt } from "../Workspace/Workspace";
 
 import { useSelector, useDispatch } from "react-redux";
-import {
-  updateShadow,
-  removeShadow,
-} from "@/features/textSettings/textSettingsSlice";
+import { removeShadow } from "@/features/textSettings/textSettingsSlice";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faEye,
-  faEyeSlash,
-  faSun,
-  faTrashCan,
-} from "@fortawesome/free-regular-svg-icons";
-import {
-  faChevronDown,
-  faGripVertical,
-} from "@fortawesome/free-solid-svg-icons";
+import { faGripVertical } from "@fortawesome/free-solid-svg-icons";
 
-import NumericInputSlider from "@/inputs/NumericInputSlider/NumericInputSlider";
-import ColorInput from "@/inputs/ColorInput/ColorInput";
-import CheckboxButton from "@/inputs/CheckboxButton/CheckboxButton";
+import InputDisplayer from "@/inputs/InputDisplayer/InputDisplayer";
+import ToolBar from "../ToolBar/ToolBar";
 
-import parse from "@/utils/parse";
-
-const ShadowStyler = ({ shadow, index, startDragging }) => {
+const ShadowStyler = ({ shadow, path, index, startDragging }) => {
   const textSettings = useSelector((store) => store.textSettings);
 
   const { shadows } = textSettings;
@@ -35,16 +20,24 @@ const ShadowStyler = ({ shadow, index, startDragging }) => {
   const dispatch = useDispatch();
 
   const [infoText, setInfoText] = useState("");
-  const [showContent, setShowContent] = useState(true);
+  // const [showContent, setShowContent] = useState(true);
+
+  const showContent = useMemo(
+    () => shadow.controls.open.config.value,
+    [shadow]
+  );
 
   const shouldUnmount = useRef(false);
 
   const stylerRef = useRef(null);
 
-  const { highlightShadow } = useContext(WorkspaceCtxt);
+  const isVisible = useMemo(
+    () => shadow.controls.enable.config.value,
+    [shadow]
+  );
 
   // Adds the 'hidden' class to the styler and adjusts the scroller's position if needed
-  const hideStyler = () => {
+  const hideStyler = useCallback(() => {
     // Select the styler element and hide it
     const styler = stylerRef.current;
     styler.classList.add(styles.hidden);
@@ -68,19 +61,7 @@ const ShadowStyler = ({ shadow, index, startDragging }) => {
 
     // Mark the ref to indicate that the styler should be unmounted once the transition ends
     shouldUnmount.current = true;
-  };
-
-  const handleUpdateShadow = (newProperty) => {
-    dispatch(updateShadow({ ...newProperty, id: shadow.id }));
-  };
-
-  const toggleProperty = (e) => {
-    const newProperty = {
-      key: e.currentTarget.name,
-      value: !parse(e.currentTarget.value),
-    };
-    dispatch(updateShadow({ ...newProperty, id: shadow.id }));
-  };
+  }, []);
 
   const toggleInfoText = (e) => {
     switch (e.type) {
@@ -97,47 +78,26 @@ const ShadowStyler = ({ shadow, index, startDragging }) => {
     }
   };
 
-  const handleHighlight = (e) => {
-    if (shadow.inputs.isVisible.value) {
-      switch (e.type) {
-        case "pointerenter":
-          highlightShadow(index);
-          break;
-        case "pointerleave":
-          highlightShadow(null);
-          break;
-
-        default:
-          break;
-      }
-    }
-    toggleInfoText(e);
-  };
-
-  const toggleState = (setState) => {
-    setState((prev) => !prev);
-  };
-
   const unMountComponent = () => {
     if (shouldUnmount.current) {
       dispatch(removeShadow(shadow.id));
-      // shouldUnmount.current = false;
     }
   };
-
-  const columnedInputs = useMemo(
-    () =>
-      Object.entries(shadow.inputs).filter((input) => input[0] !== "isVisible"),
-    [shadow]
-  );
 
   const containerClasses = useMemo(() => {
     let response = styles.shadowStyler;
     if (!showContent) response += ` ${styles.closed}`;
-    if (!shadow.inputs.isVisible.value) response += ` ${styles.inactive}`;
+    if (!isVisible) response += ` ${styles.inactive}`;
 
     return response;
-  }, [showContent, shadow.inputs.isVisible]);
+  }, [showContent, isVisible]);
+
+  const actions = useMemo(
+    () => ({
+      trashcan: { action: hideStyler, disabled: shadows.length === 1 },
+    }),
+    [shadows, hideStyler]
+  );
 
   return (
     <div
@@ -155,24 +115,27 @@ const ShadowStyler = ({ shadow, index, startDragging }) => {
             <FontAwesomeIcon icon={faGripVertical} />
           </button>
         </div>
-        <p className={styles.infoText}>{infoText}</p>
-        <div className={styles.toolsContainer}>
+        {/* <p className={styles.infoText}>{infoText}</p> */}
+        <ToolBar
+          controls={shadow.controls}
+          path={[...path, "controls"]}
+          actions={actions}
+        />
+        {/* <div className={styles.toolsContainer}>
+
           <button
-            id={shadow.inputs.isVisible.inputContainerId}
-            value={shadow.inputs.isVisible.value}
-            name={shadow.inputs.isVisible.name}
+            id={`shadow-${shadow.id}_button-isVisible`}
+            value={isVisible}
             title="Enable/Disable"
-            onClick={toggleProperty}
+            onClick={toggleVisibility}
             onPointerEnter={toggleInfoText}
             onPointerLeave={toggleInfoText}
           >
-            <FontAwesomeIcon
-              icon={shadow.inputs.isVisible.value ? faEye : faEyeSlash}
-            />
+            <FontAwesomeIcon icon={isVisible ? faEye : faEyeSlash} />
           </button>
           <button
             title="Highlight"
-            disabled={!shadow.inputs.isVisible.value}
+            disabled={!isVisible}
             onPointerEnter={handleHighlight}
             onPointerLeave={handleHighlight}
           >
@@ -192,58 +155,18 @@ const ShadowStyler = ({ shadow, index, startDragging }) => {
           <button onClick={() => toggleState(setShowContent)}>
             <FontAwesomeIcon icon={faChevronDown} />
           </button>
-        </div>
+        </div> */}
       </div>
       <div className={styles.inputContainer}>
-        {columnedInputs.map((input) => {
-          const [inputName, config] = input;
-          switch (config.type) {
-            case "number":
-              return (
-                <NumericInputSlider
-                  key={config.inputId}
-                  inputId={config.inputId}
-                  name={inputName}
-                  label={config.labeltext}
-                  inputContainerId={config.inputContainerId}
-                  icon={config.icon}
-                  range={config.range}
-                  minValue={config.minValue}
-                  maxValue={config.maxValue}
-                  defaultValue={config.defaultValue}
-                  value={config.value}
-                  unit="px"
-                  setValue={handleUpdateShadow}
-                />
-              );
-
-            case "color":
-              const overrideInput = shadow.inputs[config.depedency];
-
-              return (
-                <div key={config.inputId} className={styles.colorSelection}>
-                  <ColorInput
-                    inputId={config.inputId}
-                    inputContainerId={config.inputContainerId}
-                    name={inputName}
-                    label={config.labeltext}
-                    icon={config.icon}
-                    defaultValue={config.defaultValue}
-                    value={config.value}
-                    setValue={handleUpdateShadow}
-                    disabled={overrideInput.value}
-                  />
-                  <CheckboxButton
-                    inputId={overrideInput.inputId}
-                    inputContainerId={overrideInput.inputContainerId}
-                    name={overrideInput.name}
-                    onClick={toggleProperty}
-                    value={overrideInput.value}
-                    text={overrideInput.labelText}
-                  />
-                </div>
-              );
-          }
+        {Object.entries(shadow.inputs).map(([inputName, config]) => {
+          const inputPath = [...path, "inputs", inputName];
+          return (
+            <InputDisplayer
+              key={config.inputId}
+              config={config}
+              path={inputPath}
+            />
+          );
         })}
       </div>
     </div>

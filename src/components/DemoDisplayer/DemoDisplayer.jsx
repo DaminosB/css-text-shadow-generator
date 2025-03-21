@@ -13,7 +13,7 @@ import { WorkspaceCtxt } from "../Workspace/Workspace";
 import { useSelector, useDispatch } from "react-redux";
 import { replaceState } from "@/features/textSettings/textSettingsSlice";
 
-import useDemoPattern from "@/hooks/useDemoPattern";
+import demoPattern from "@/config/builders/createDemoPattern";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -37,24 +37,19 @@ const DemoDisplayer = () => {
 
   const textSettings = useSelector((state) => state.textSettings);
 
-  const demoPattern = useDemoPattern(textSettings);
-
   const dispatch = useDispatch();
 
   const demoBoxRef = useRef(null);
   const confirmationBoxRef = useRef(null);
 
-  const currentStep = useMemo(
-    () => demoPattern[demoStep],
-    [demoPattern, demoStep]
-  );
+  const currentStep = useMemo(() => demoPattern[demoStep], [demoStep]);
 
   const cachedState = useRef(textSettings);
 
   const posDemoBox = useCallback((currentStep) => {
     const { inputData, demoConfig } = currentStep;
 
-    const targetElement = document.getElementById(inputData.inputContainerId);
+    const targetElement = document.getElementById(demoConfig.targetId);
     const scroller = targetElement.closest('[data-role="scroller"]');
     const demoBox = demoBoxRef.current;
 
@@ -104,6 +99,7 @@ const DemoDisplayer = () => {
       width: demoBox.offsetWidth,
       height: demoBox.offsetHeight,
     };
+
     ({ adjustedX: newX, adjustedY: newY } = adjustBoxPosition(
       newX,
       newY,
@@ -115,13 +111,13 @@ const DemoDisplayer = () => {
 
   const closeDemoMode = useCallback(() => {
     const focusedContainer = document.getElementById(
-      currentStep.inputData.inputContainerId
+      currentStep.demoConfig.targetId
     );
 
     focusedContainer.classList.remove("focused");
     dispatch(replaceState(cachedState.current));
     setModaleContent(null);
-  }, [currentStep, dispatch, setModaleContent, textSettings]);
+  }, [currentStep, dispatch, setModaleContent]);
 
   const navigateDemoMode = useCallback(
     (newIndex) => {
@@ -130,18 +126,18 @@ const DemoDisplayer = () => {
       dispatch(replaceState(newStep.state));
       requestAnimationFrame(() => {
         const currentFocusedContainer = document.getElementById(
-          currentStep.inputData.inputContainerId
+          currentStep.demoConfig.targetId
         );
         if (currentFocusedContainer)
           currentFocusedContainer.classList.remove("focused");
 
         const nextFocusedContainer = document.getElementById(
-          demoPattern[newIndex].inputData.inputContainerId
+          demoPattern[newIndex].demoConfig.targetId
         );
         if (nextFocusedContainer) nextFocusedContainer.classList.add("focused");
       });
     },
-    [currentStep, dispatch, demoPattern]
+    [currentStep, dispatch]
   );
 
   const displayConfirmationBox = useCallback(
@@ -257,11 +253,11 @@ const DemoDisplayer = () => {
     demoStep,
     showConfirmationBox,
     currentStep,
-    demoPattern,
     displayConfirmationBox,
     closeDemoMode,
     navigateDemoMode,
     posDemoBox,
+    dispatch,
   ]);
 
   return (
@@ -333,7 +329,10 @@ const adjustBoxPosition = (x, y, boxSize, avoidRect) => {
 
     if (isOverlappingX) {
       if (avoidRect.top - boxSize.height < 0) {
-        adjustedY = avoidRect.bottom;
+        adjustedY = Math.min(
+          avoidRect.bottom,
+          window.innerHeight - boxSize.height
+        );
       } else {
         adjustedY = avoidRect.top - boxSize.height;
       }

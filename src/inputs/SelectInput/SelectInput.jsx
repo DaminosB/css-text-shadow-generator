@@ -1,13 +1,14 @@
 import styles from "./SelectInput.module.css";
 
-import { useContext, useMemo, useState, useRef } from "react";
-import { WorkspaceCtxt } from "@/components/Workspace/Workspace";
+import { useMemo, useState, useRef } from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronUp } from "@fortawesome/free-solid-svg-icons";
+import { faCheckSquare, faChevronUp } from "@fortawesome/free-solid-svg-icons";
 
 import InputFrame from "../InputFrame/InputFrame";
-import CheckboxButton from "../CheckboxButton/CheckboxButton";
+import SmartButton from "../SmartButton/SmartButton";
+
+import { faSquare } from "@fortawesome/free-regular-svg-icons";
 import parse from "@/utils/parse";
 
 const SelectInput = ({
@@ -17,8 +18,8 @@ const SelectInput = ({
   inputContainerId,
   icon,
   value,
-  list,
   setValue,
+  list,
 }) => {
   const filters = useMemo(
     () =>
@@ -44,7 +45,7 @@ const SelectInput = ({
   );
 
   const resetValue = () => {
-    setValue({ key: name, value: lastClickedItem.current });
+    setValue(lastClickedItem.current);
   };
 
   return (
@@ -68,15 +69,19 @@ const SelectInput = ({
         <div>
           {filters.map((currentFilter) => {
             const toggleFilters = (e) => {
-              const buttonValue = parse(e.currentTarget.value);
+              const newValue = !parse(e.currentTarget.value);
+              const currentValue = parse(e.currentTarget.value);
+              console.log(newValue);
 
-              if (filters.length === activeFilters.length) {
+              if (activeFilters.length === filters.length) {
                 setActiveFilters([currentFilter]);
-              } else if (buttonValue && activeFilters.length > 1) {
+              } else if (activeFilters.length === 1 && currentValue) {
+                setActiveFilters(filters);
+              } else if (currentValue && activeFilters.length > 1) {
                 setActiveFilters((prev) =>
                   prev.filter((filterName) => filterName !== currentFilter)
                 );
-              } else if (!buttonValue) {
+              } else if (!currentValue) {
                 setActiveFilters((prev) => [...prev, currentFilter]);
               }
             };
@@ -91,11 +96,12 @@ const SelectInput = ({
               (isActiveFilter && activeFilters.length === 1);
 
             return (
-              <CheckboxButton
+              <SmartButton
                 key={checkboxId}
                 inputId={checkboxId}
                 inputContainerId={checkBoxContainerId}
                 name={currentFilter}
+                icons={{ on: faCheckSquare, off: faSquare }}
                 onClick={toggleFilters}
                 value={isActiveFilter}
                 text={currentFilter}
@@ -112,7 +118,7 @@ const SelectInput = ({
             .sort((a, b) => a.label.localeCompare(b.label))
             .map((item) => {
               const handleOnMouseOver = () => {
-                if (isOpen) setValue({ key: name, value: item.label });
+                if (isOpen) setValue(item.label);
               };
 
               const handleOnClick = () => {

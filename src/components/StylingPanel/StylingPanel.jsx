@@ -184,12 +184,14 @@ const StylingPanel = () => {
         data-role="scroller"
       >
         <div>
-          <TextStyler />
+          <TextStyler path={["textConfig"]} />
           {shadows.map((shadow, index) => {
+            const shadowPath = ["shadows", index];
             return (
               <ShadowStyler
                 key={shadow.id}
                 shadow={shadow}
+                path={shadowPath}
                 index={index}
                 startDragging={startDragging}
               />

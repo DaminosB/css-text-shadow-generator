@@ -1,58 +1,18 @@
 import styles from "./OutputBox.module.css";
 
-import { useState, useContext, useMemo } from "react";
-import { WorkspaceCtxt } from "../Workspace/Workspace";
-
-import { useSelector } from "react-redux";
+import { useState } from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCopy } from "@fortawesome/free-regular-svg-icons";
 import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
 
-const OutputBox = () => {
-  const textSettings = useSelector((store) => store.textSettings);
-  const { shadows } = textSettings;
-
+const OutputBox = ({ cssOutput }) => {
   const [isOpen, setIsOpen] = useState(true);
-
-  const outputStrings = useMemo(
-    () =>
-      shadows
-        .filter((shadow) => {
-          const { xShadowLength, yShadowLength, blurRadius, isVisible } =
-            shadow.inputs;
-          return (
-            isVisible.value &&
-            (xShadowLength.value !== 0 ||
-              yShadowLength.value !== 0 ||
-              blurRadius.value !== 0)
-          );
-        })
-        .map((shadow, index, array) => {
-          const {
-            xShadowLength,
-            yShadowLength,
-            blurRadius,
-            shadowColor,
-            inheritTextColor,
-          } = shadow.inputs;
-
-          let output = `${xShadowLength.value}px ${yShadowLength.value}px ${blurRadius.value}px`;
-
-          if (!inheritTextColor.value) output += ` ${shadowColor.value}`;
-
-          if (index < array.length - 1) output += ",";
-          else output += ";";
-
-          return output;
-        }),
-    [shadows]
-  );
 
   const copyToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(
-        `text-shadow: ${outputStrings.join("")}`
+        `text-shadow: ${cssOutput.join(", ")};`
       );
     } catch (error) {
       console.error(error);
@@ -71,13 +31,10 @@ const OutputBox = () => {
       <div>
         <h2>Output</h2>
         <div>
-          <button
-            disabled={outputStrings.length === 0}
-            onClick={copyToClipboard}
-          >
+          <button disabled={cssOutput.length === 0} onClick={copyToClipboard}>
             <FontAwesomeIcon icon={faCopy} />
           </button>
-          <button onClick={toggleIsOpen} disabled={outputStrings.length === 0}>
+          <button onClick={toggleIsOpen} disabled={cssOutput.length === 0}>
             <FontAwesomeIcon icon={faChevronDown} />
           </button>
         </div>
@@ -85,17 +42,17 @@ const OutputBox = () => {
       <div>
         <pre>
           <code>
-            {outputStrings.length > 0 ? (
+            {cssOutput.length > 0 ? (
               <>
                 <span className="yellow">text-shadow: </span>
-                {outputStrings.map((string, index, array) => {
+                {cssOutput.map((string, index) => {
                   return (
                     <span
-                      key={index}
+                      key={crypto.randomUUID()}
                       className={index > 0 ? styles.incremented : ""}
                     >
                       {string}
-                      <br />
+                      {index < cssOutput.length - 1 ? ", " : ";"}
                     </span>
                   );
                 })}

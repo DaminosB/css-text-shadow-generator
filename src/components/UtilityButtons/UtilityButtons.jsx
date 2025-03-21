@@ -1,7 +1,7 @@
 import styles from "./UtilityButtons.module.css";
 
 import { useState, useRef } from "react";
-import { useContext } from "react";
+import { useContext, useMemo } from "react";
 import { WorkspaceCtxt } from "../Workspace/Workspace";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -28,31 +28,22 @@ const UtilityButtons = ({}) => {
     setIsOpen((prev) => !prev);
   };
 
+  const textLabels = useMemo(
+    () => ({
+      demo: "Open demo mode",
+      learn: "About this property",
+      about: "About this app",
+      toggle: isOpen ? "Close" : "More infos",
+    }),
+    [isOpen]
+  );
+
   const displayInfoText = (e) => {
     const infoTextElem = infoTextElemRef.current;
 
     if (e.type === "pointerenter") {
       infoTextElem.classList.remove("hidden");
-      switch (e.currentTarget.value) {
-        case "demo":
-          setInfoText("Open demo mode");
-          break;
-
-        case "learn":
-          setInfoText("About this property");
-          break;
-
-        case "about":
-          setInfoText("About this app");
-          break;
-
-        case "toggle":
-          setInfoText(isOpen ? "Close" : "More infos");
-          break;
-
-        default:
-          break;
-      }
+      setInfoText(textLabels[e.currentTarget.value]);
     } else if (e.type === "pointerleave") {
       infoTextElem.classList.add("hidden");
     }

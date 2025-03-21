@@ -3,7 +3,6 @@
 import styles from "./Workspace.module.css";
 
 import { useState, createContext } from "react";
-
 export const WorkspaceCtxt = createContext();
 
 import { Provider } from "react-redux";
@@ -16,19 +15,10 @@ import DemoDisplayer from "../DemoDisplayer/DemoDisplayer";
 import UtilityButtons from "../UtilityButtons/UtilityButtons";
 import About from "../About/About";
 
-const Workspace = ({ fontLibrary }) => {
-  const [highlightedShadow, setHighlightedShadow] = useState(null);
-
+const Workspace = () => {
   const [modaleContent, setModaleContent] = useState(null);
 
-  const highlightShadow = (indexToHighlight) => {
-    setHighlightedShadow(indexToHighlight);
-  };
-
   const contextValues = {
-    fontLibrary,
-    highlightShadow,
-    highlightedShadow,
     modaleContent,
     setModaleContent,
   };
@@ -39,7 +29,7 @@ const Workspace = ({ fontLibrary }) => {
         <div className={styles.workspace}>
           <div className={styles.previewWindow}>
             <StylingPanel />
-            <TextPreview />
+            <TextPreview path={["textConfig"]} />
           </div>
           <UtilityButtons />
           <DemoDisplayer />

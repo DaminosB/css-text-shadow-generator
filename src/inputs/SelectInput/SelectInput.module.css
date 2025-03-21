@@ -2,6 +2,7 @@
   width: 100%;
   display: flex;
   justify-content: space-between;
+  align-items: center;
   font-size: 1rem;
 }
 
@@ -38,7 +39,8 @@
 }
 .selectionWindow > div:last-of-type {
   height: calc(5 * 1.5rem);
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
   scrollbar-width: thin;
   border: var(--default-border);
   display: flex;

@@ -15,9 +15,9 @@ const NumericInputSlider = ({
   icon,
   range,
   value,
+  setValue,
   defaultValue,
   unit,
-  setValue,
   minValue,
   maxValue,
 }) => {
@@ -50,7 +50,7 @@ const NumericInputSlider = ({
 
       const input = document.getElementById(inputId);
 
-      setValue({ key: input.name, value: newValue });
+      setValue(newValue);
     }
   };
 
@@ -90,12 +90,13 @@ const NumericInputSlider = ({
     if (newValue < minValue) newValue = minValue;
     else if (e.target.value > maxValue) newValue = maxValue;
 
-    setValue({ key: e.target.name, value: newValue });
+    setValue(newValue);
   };
 
   const handleOnBlur = (e) => {
-    if (e.target.value === "")
-      setValue({ key: e.target.name, value: defaultValue });
+    if (e.target.value === "") {
+      setValue(defaultValue);
+    }
   };
 
   return (

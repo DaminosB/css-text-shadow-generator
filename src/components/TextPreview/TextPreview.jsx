@@ -1,15 +1,17 @@
 import styles from "./TextPreview.module.css";
 
+import fontLibrary from "@/config/fonts/googleFonts";
+
 import { useMemo, useContext } from "react";
 import { WorkspaceCtxt } from "../Workspace/Workspace";
 
 import { useSelector, useDispatch } from "react-redux";
-import { updateRootSettings } from "@/features/textSettings/textSettingsSlice";
+import { updateSetting } from "@/features/textSettings/textSettingsSlice";
+
 import OutputBox from "../OutputBox/OutputBox";
 
-const TextPreview = () => {
-  const { fontLibrary, highlightedShadow, modaleContent } =
-    useContext(WorkspaceCtxt);
+const TextPreview = ({ path }) => {
+  const { modaleContent } = useContext(WorkspaceCtxt);
 
   const isDemoMode = useMemo(() => modaleContent === "demo", [modaleContent]);
 
@@ -17,48 +19,42 @@ const TextPreview = () => {
 
   const dispatch = useDispatch();
 
-  const dispatchRootUpdate = (e) => {
-    dispatch(updateRootSettings({ key: e.target.name, value: e.target.value }));
+  const updateUserText = (e) => {
+    dispatch(
+      updateSetting({
+        path: [...path, "inputs", "userText"],
+        key: "value",
+        value: e.target.value,
+      })
+    );
   };
+
+  const cssOutput = useMemo(() => {
+    const highlightedShadow = shadows.find(
+      (shadow) => shadow.controls.highlight.config.value
+    );
+
+    const filteredShadows = highlightedShadow
+      ? [highlightedShadow]
+      : shadows.filter((shadow) => shadow.controls.enable.config.value);
+
+    return createShadowOutput(filteredShadows);
+  }, [shadows]);
 
   const textStyle = useMemo(
     () => ({
-      ...fontLibrary[textConfig.textFont.value].style,
-      fontSize: `${textConfig.fontSize.value}px`,
-      color: textConfig.textColor.value,
-      backgroundColor: textConfig.backgroundColor.value,
-      textShadow: shadows
-        .map((shadow, index) => {
-          const {
-            xShadowLength,
-            yShadowLength,
-            blurRadius,
-            shadowColor,
-            isVisible,
-            inheritTextColor,
-          } = shadow.inputs;
-
-          if (
-            !isVisible.value ||
-            (highlightedShadow !== null && highlightedShadow !== index)
-          )
-            return;
-
-          const colorString = inheritTextColor.value
-            ? textConfig.textColor.value
-            : shadowColor.value;
-
-          return `${xShadowLength.value}px ${yShadowLength.value}px ${blurRadius.value}px ${colorString}`;
-        })
-        .filter((shadowString) => shadowString)
-        .join(", "),
+      ...fontLibrary[textConfig.inputs.textFont.value].style,
+      fontSize: `${textConfig.inputs.fontSize.value}px`,
+      color: textConfig.inputs.textColor.value,
+      backgroundColor: textConfig.inputs.backgroundColor.value,
+      textShadow: cssOutput.join(", "),
     }),
-    [shadows, textConfig, highlightedShadow, fontLibrary]
+    [textConfig, cssOutput]
   );
 
   return (
     <div
-      id={textConfig.userText.inputContainerId}
+      id={textConfig.inputs.userText.inputContainerId}
       className={styles.textPreview}
     >
       <textarea
@@ -66,12 +62,55 @@ const TextPreview = () => {
         name="userText"
         style={textStyle}
         className={isDemoMode ? styles.transition : ""}
-        value={textConfig.userText.value}
-        onChange={dispatchRootUpdate}
+        value={textConfig.inputs.userText.value}
+        onChange={updateUserText}
       ></textarea>
-      <OutputBox />
+      <OutputBox cssOutput={cssOutput} />
     </div>
   );
 };
+
+const createShadowOutput = (shadows) =>
+  shadows
+    .map((shadow) => {
+      const { blurRadius, xShadowLength, yShadowLength, shadowColor } =
+        Object.entries(shadow.inputs).reduce((acc, [inputName, config]) => {
+          if (config.toggleOption?.value) {
+            return { ...acc, [inputName]: null };
+          } else if (config.type === "group") {
+            return {
+              ...acc,
+              ...Object.entries(config.inputs).reduce(
+                (subAcc, [subInputName, subConfig]) => ({
+                  ...subAcc,
+                  [subInputName]: {
+                    value: subConfig.value,
+                    format: subConfig.format,
+                  },
+                }),
+                {}
+              ),
+            };
+          } else {
+            return {
+              ...acc,
+              [inputName]: { value: config.value, format: config.format },
+            };
+          }
+        }, {});
+
+      if (blurRadius.value || xShadowLength.value || yShadowLength.value) {
+        let output = "";
+
+        output += `${xShadowLength.value}${xShadowLength.format}`;
+        output += ` ${yShadowLength.value}${yShadowLength.format}`;
+        if (blurRadius.value)
+          output += ` ${blurRadius.value}${blurRadius.format}`;
+        if (shadowColor) output += ` ${shadowColor.value}`;
+
+        return output;
+      }
+    })
+    .filter((output) => output);
 
 export default TextPreview;

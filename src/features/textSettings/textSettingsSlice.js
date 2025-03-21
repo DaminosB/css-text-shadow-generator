@@ -1,32 +1,30 @@
-import { createSlice, nanoid } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 
-import TextConfig from "@/config/classes/TextConfig";
-import ShadowConfig from "@/config/classes/ShadowConfig";
+import createShadow from "@/config/builders/createShadow";
+import createTextConfig from "@/config/builders/createTextConfig";
 
 const initialState = {
-  textConfig: TextConfig.createConfig(),
-  shadows: [ShadowConfig.createShadow("initial-shadow")],
+  textConfig: createTextConfig(),
+  shadows: [createShadow("initial-shadow")],
 };
 
 const textSettingsSlice = createSlice({
   name: "textSettings",
   initialState,
   reducers: {
-    replaceState: (state, action) => {
-      return action.payload;
+    replaceState: (state, action) => action.payload,
+
+    updateSetting: (state, action) => {
+      const { path, key, value } = action.payload;
+      const target = path.reduce((acc, entry) => acc[entry], state);
+      target[key] = value;
     },
-    updateRootSettings: (state, action) => {
-      const { key, value } = action.payload;
-      state.textConfig[key].value = value;
-    },
+
     addShadow: (state, action) => {
-      state.shadows = [...state.shadows, ShadowConfig.createShadow(nanoid())];
+      const newShadow = createShadow();
+      state.shadows = [...state.shadows, newShadow];
     },
-    updateShadow: (state, action) => {
-      const { id, key, value } = action.payload;
-      state.shadows.find((shadow) => shadow.id === id).inputs[key].value =
-        value;
-    },
+
     removeShadow: (state, action) => {
       if (state.shadows.length > 1) {
         state.shadows = state.shadows.filter(
@@ -34,6 +32,7 @@ const textSettingsSlice = createSlice({
         );
       }
     },
+
     moveShadow: (state, action) => {
       const { id, newIndex } = action.payload;
 
@@ -49,9 +48,8 @@ const textSettingsSlice = createSlice({
 
 export const {
   replaceState,
-  updateRootSettings,
+  updateSetting,
   addShadow,
-  updateShadow,
   removeShadow,
   moveShadow,
 } = textSettingsSlice.actions;
