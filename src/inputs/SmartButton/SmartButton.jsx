@@ -1,19 +1,31 @@
+import styles from "./SmartButton.module.css";
+
+import { useMemo } from "react";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import styles from "./CheckboxButton.module.css";
-import { faSquareCheck } from "@fortawesome/free-solid-svg-icons";
-import { faSquare } from "@fortawesome/free-regular-svg-icons";
+
 import InputFrame from "../InputFrame/InputFrame";
 
-const CheckboxButton = ({
+const SmartButton = ({
   inputId,
   inputContainerId,
   name,
-  onClick,
   value,
   text,
+  icons,
+  icon,
+  onClick,
+  onPointerEnter,
+  onPointerLeave,
   isDimmed = false,
   disabled = false,
 }) => {
+  const currentIcon = useMemo(() => {
+    if (value && icons?.on) return icons.on;
+    else if (!value && icons?.off) return icons.off;
+    else return icon;
+  }, [icons, icon, value]);
+
   return (
     <InputFrame inputId={inputId} inputContainerId={inputContainerId}>
       <div className={styles.checkbox}>
@@ -22,15 +34,17 @@ const CheckboxButton = ({
           className={isDimmed ? "ethereal" : ""}
           name={name}
           onClick={onClick}
+          onPointerEnter={onPointerEnter}
+          onPointerLeave={onPointerLeave}
           value={value}
           disabled={disabled}
         >
-          <FontAwesomeIcon icon={value ? faSquareCheck : faSquare} />
+          <FontAwesomeIcon icon={currentIcon} />
         </button>
-        <span>{text}</span>
+        {text && <span>{text}</span>}
       </div>
     </InputFrame>
   );
 };
 
-export default CheckboxButton;
+export default SmartButton;
