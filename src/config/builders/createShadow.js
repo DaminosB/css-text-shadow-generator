@@ -73,7 +73,7 @@ const createShadow = (id, presets = {}) => {
       format: "hexa",
     })
     .setToggleOption("shadowColor", {
-      value: true,
+      value: shadowColor ? false : true,
       labelText: "use text color",
       icons: { active: faSquareCheck, inactive: faSquare },
     })
