@@ -5,6 +5,7 @@ import { useMemo } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import InputFrame from "../InputFrame/InputFrame";
+import { validHexColor } from "@/utils/regEx";
 
 const ColorInput = ({
   inputId,
@@ -24,7 +25,7 @@ const ColorInput = ({
   const previewStyle = useMemo(() => ({ backgroundColor: value }), [value]);
 
   const handleOnBlur = (e) => {
-    const matchesPattern = stringRegex.test(e.target.value);
+    const matchesPattern = validHexColor.test(e.target.value);
     if (matchesPattern) setValue(e.target.value.toUpperCase());
     else setValue(defaultValue);
   };
@@ -67,6 +68,5 @@ const ColorInput = ({
     </InputFrame>
   );
 };
-const stringRegex = /^#?([0-9a-f]{6}|[0-9a-f]{3})$/i;
 
 export default ColorInput;
