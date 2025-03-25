@@ -37,24 +37,13 @@
   opacity: 0;
 }
 
-.output > div:last-child > pre {
+.output pre {
   border-top: 1px solid var(--secondary-color-medium-transparency);
   padding: 0.5rem;
   max-height: 7rem;
   width: 100%;
   overflow: auto;
   scrollbar-width: thin;
-}
-
-.output
-  > div:last-child
-  > pre
-  span:not(:first-of-type):not(:last-of-type)::after {
-  content: "\A";
-}
-
-span.incremented {
-  margin-left: 2rem;
 }
 
 @media (max-width: 1023px) {

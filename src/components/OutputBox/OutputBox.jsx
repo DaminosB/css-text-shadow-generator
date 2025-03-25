@@ -3,24 +3,37 @@ import styles from "./OutputBox.module.css";
 import { useState } from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCopy } from "@fortawesome/free-regular-svg-icons";
+import { faCopy, faPenToSquare } from "@fortawesome/free-regular-svg-icons";
 import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
 
-const OutputBox = ({ cssOutput }) => {
+import CssCodeBox from "../CssCodeBox/CssCodeBox";
+import CssEditorBox from "../CssEditorBox/CssEditorBox";
+
+const OutputBox = ({ cssOutput, textShadow }) => {
   const [isOpen, setIsOpen] = useState(true);
+  const [isEditMode, setIsEditMode] = useState(false);
 
   const copyToClipboard = async () => {
     try {
-      await navigator.clipboard.writeText(
-        `text-shadow: ${cssOutput.join(", ")};`
-      );
+      await navigator.clipboard.writeText(`text-shadow: ${textShadow};`);
     } catch (error) {
       console.error(error);
     }
   };
 
-  const toggleIsOpen = () => {
-    setIsOpen((prev) => !prev);
+  const toggleModes = (e) => {
+    switch (e.currentTarget.name) {
+      case "edit":
+        setIsEditMode((prev) => !prev);
+        break;
+
+      case "expand":
+        setIsOpen((prev) => !prev);
+        break;
+
+      default:
+        break;
+    }
   };
 
   return (
@@ -31,36 +44,28 @@ const OutputBox = ({ cssOutput }) => {
       <div>
         <h2>Output</h2>
         <div>
-          <button disabled={cssOutput.length === 0} onClick={copyToClipboard}>
+          <button
+            name="copy"
+            disabled={cssOutput.length === 0}
+            onClick={copyToClipboard}
+          >
             <FontAwesomeIcon icon={faCopy} />
           </button>
-          <button onClick={toggleIsOpen} disabled={cssOutput.length === 0}>
+          <button name="edit" onClick={toggleModes}>
+            <FontAwesomeIcon icon={faPenToSquare} />
+          </button>
+          <button name="expand" onClick={toggleModes}>
             <FontAwesomeIcon icon={faChevronDown} />
           </button>
         </div>
       </div>
       <div>
         <pre>
-          <code>
-            {cssOutput.length > 0 ? (
-              <>
-                <span className="yellow">text-shadow: </span>
-                {cssOutput.map((string, index) => {
-                  return (
-                    <span
-                      key={crypto.randomUUID()}
-                      className={index > 0 ? styles.incremented : ""}
-                    >
-                      {string}
-                      {index < cssOutput.length - 1 ? ", " : ";"}
-                    </span>
-                  );
-                })}
-              </>
-            ) : (
-              <span className="yellow">No shadows are currently visible</span>
-            )}
-          </code>
+          {isEditMode ? (
+            <CssEditorBox setIsEditMode={setIsEditMode} cssOutput={cssOutput} />
+          ) : (
+            <CssCodeBox setIsEditMode={setIsEditMode} cssOutput={cssOutput} />
+          )}
         </pre>
       </div>
     </div>

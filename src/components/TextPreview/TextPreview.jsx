@@ -41,15 +41,20 @@ const TextPreview = ({ path }) => {
     return createShadowOutput(filteredShadows);
   }, [shadows]);
 
+  const textShadow = useMemo(
+    () => cssOutput.map((o) => o.string).join(", "),
+    [cssOutput]
+  );
+
   const textStyle = useMemo(
     () => ({
       ...fontLibrary[textConfig.inputs.textFont.value].style,
       fontSize: `${textConfig.inputs.fontSize.value}px`,
       color: textConfig.inputs.textColor.value,
       backgroundColor: textConfig.inputs.backgroundColor.value,
-      textShadow: cssOutput.join(", "),
+      textShadow,
     }),
-    [textConfig, cssOutput]
+    [textConfig, textShadow]
   );
 
   return (
@@ -65,7 +70,7 @@ const TextPreview = ({ path }) => {
         value={textConfig.inputs.userText.value}
         onChange={updateUserText}
       ></textarea>
-      <OutputBox cssOutput={cssOutput} />
+      <OutputBox cssOutput={cssOutput} textShadow={textShadow} />
     </div>
   );
 };
@@ -100,15 +105,18 @@ const createShadowOutput = (shadows) =>
         }, {});
 
       if (blurRadius.value || xShadowLength.value || yShadowLength.value) {
-        let output = "";
+        let string = "";
 
-        output += `${xShadowLength.value}${xShadowLength.format}`;
-        output += ` ${yShadowLength.value}${yShadowLength.format}`;
+        string += `${xShadowLength.value}${xShadowLength.format}`;
+        string += ` ${yShadowLength.value}${yShadowLength.format}`;
         if (blurRadius.value)
-          output += ` ${blurRadius.value}${blurRadius.format}`;
-        if (shadowColor) output += ` ${shadowColor.value}`;
+          string += ` ${blurRadius.value}${blurRadius.format}`;
+        if (shadowColor) string += ` ${shadowColor.value}`;
 
-        return output;
+        return {
+          id: shadow.id,
+          string,
+        };
       }
     })
     .filter((output) => output);

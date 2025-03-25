@@ -4,7 +4,7 @@
   position: relative;
 }
 
-.textPreview textarea {
+.textPreview > textarea {
   width: 100%;
   height: 100%;
   text-align: center;
@@ -12,6 +12,6 @@
   resize: none;
 }
 
-.textPreview textarea.transition {
+.textPreview > textarea.transition {
   transition: var(--fast-transition) var(--default-animation);
 }
