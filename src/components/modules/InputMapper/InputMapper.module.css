@@ -1,0 +1,11 @@
+.inputMapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: var(--standard-padding) 0;
+  gap: var(--gap-between-inputs);
+
+  & > div {
+    width: 100%;
+  }
+}

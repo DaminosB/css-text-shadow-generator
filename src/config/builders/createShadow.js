@@ -3,8 +3,6 @@ import InputPattern from "@/config/classes/InputPattern";
 import {
   faBrush,
   faBullseye,
-  faChevronDown,
-  faChevronUp,
   faHighlighter,
   faRulerCombined,
   faRulerHorizontal,
@@ -21,7 +19,7 @@ import {
 const createShadow = (id, presets = {}) => {
   const { xShadowLength, yShadowLength, blurRadius, shadowColor } = presets;
 
-  const inputsPattern = new InputPattern(id);
+  const inputsPattern = new InputPattern(id, "Layer");
   inputsPattern
     .addInputsGroup(
       "shadowLength",
@@ -92,12 +90,6 @@ const createShadow = (id, presets = {}) => {
     .addAction("trashcan", {
       labelText: "Remove the layer",
       icon: faTrashCan,
-    })
-    .addBoolean("open", {
-      labelTexts: { on: "Collapse layer", off: "Expand layer" },
-      value: true,
-      trigger: "click",
-      icons: { on: faChevronDown, off: faChevronUp },
     });
   return inputsPattern.data;
 };

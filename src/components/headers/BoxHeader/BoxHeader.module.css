@@ -1,0 +1,19 @@
+.boxHeader {
+  display: flex;
+  justify-content: space-between;
+  background-color: var(--primary-color-medium-transparency);
+  font-weight: bold;
+  padding: 0.25rem var(--standard-padding);
+  font-size: 1.25rem;
+  gap: 1.5rem;
+  touch-action: none;
+}
+
+.buttonsContainer {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.buttonsContainer > label {
+  justify-items: right;
+}

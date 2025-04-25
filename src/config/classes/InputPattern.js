@@ -1,7 +1,9 @@
-export default class InputPatternBuilder {
-  constructor(id) {
+export default class InputPattern {
+  constructor(id, label) {
     this.data = {
-      id: id ?? crypto.randomUUID(),
+      // id: id ?? crypto.randomUUID(),
+      id: id ?? Math.random(),
+      label,
       inputs: {},
       controls: {},
     };
@@ -217,7 +219,7 @@ export default class InputPatternBuilder {
 
   _addInput(name, config, group) {
     let target = this.data.inputs;
-    let idString = this.rootIdString;
+    let idString = `${this.rootIdString}_${config.name}`;
 
     if (group) {
       if (!target[group]) {
@@ -240,8 +242,8 @@ export default class InputPatternBuilder {
       target[name] = {
         ...config,
         name,
-        inputId: `${idString}_input-${config.name}`,
-        inputContainerId: `${idString}_container-${config.name}`,
+        inputId: `${idString}_input`,
+        inputContainerId: `${idString}_container`,
         value: config.value ?? config.defaultValue,
       };
     }

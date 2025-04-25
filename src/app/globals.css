@@ -1,14 +1,18 @@
 :root {
   --header-height: 6rem;
+  --sidebar-width: 4rem;
 
   --fast-transition: 250ms;
   --average-transition: 500ms;
   --default-animation: ease-in-out;
   --fade-in-animation: fade-in var(--fast-transition);
 
-  --gap-between-inputs: 1.5rem;
+  --gap-between-inputs: 0.75rem;
+  --standard-padding: 0.5rem;
 
   --primary-color: #262626;
+  --primary-color-light-transparency: #262626bf;
+  --primary-color-medium-transparency: #2626267f;
   --primary-color-high-transparency: #2626263f;
   --secondary-color: #eaeae5;
   --secondary-color-light-transparency: #eaeae5bf;
@@ -112,6 +116,7 @@ time,
 mark,
 audio,
 video,
+dialog,
 button {
   box-sizing: border-box;
   margin: 0;
@@ -188,18 +193,6 @@ main {
   height: 100%;
 }
 
-header {
-  position: absolute;
-  z-index: 1;
-  top: 0px;
-  left: 0px;
-  width: 100%;
-  height: var(--header-height);
-  align-content: center;
-  padding: 0 1.5rem;
-  /* color: #3a342c; */
-}
-
 button:not(.grabbable) {
   cursor: pointer;
 }
@@ -221,38 +214,69 @@ h2 {
   font-size: 1.25rem;
 }
 
+header {
+  position: absolute;
+  z-index: 10;
+  top: 0px;
+  left: var(--sidebar-width);
+  /* width: 100%; */
+  /* padding-left: ; */
+  height: var(--header-height);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1.5rem;
+}
+
 input,
 .input-mock {
   color: inherit;
   background-color: var(--secondary-color-high-transparency);
   text-align: center;
   align-content: center;
-  /* width: 3rem; */
   font-size: 1rem;
-  padding: 0.25rem 0.5rem;
+  padding: 0.25rem;
   transition: var(--fast-transition) var(--default-animation);
 }
 
 input:hover,
-.input-mock:hover {
+label:hover > .input-mock {
   background-color: var(--secondary-color-medium-transparency);
-}
-
-input[type="color"],
-input[type="checkbox"] {
-  display: none;
-}
-
-label:has(> input[type="color"]) > div {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  border: 1px solid black;
-  cursor: pointer;
 }
 
 .ethereal {
   opacity: 25%;
+}
+
+label:has(:focus) .extension-bottom {
+  visibility: visible;
+  opacity: 1;
+}
+
+.extension-bottom {
+  visibility: hidden;
+  opacity: 0;
+  border: 1px solid var(--secondary-color);
+  margin-top: var(--standard-padding);
+  backdrop-filter: blur(3px);
+  width: calc(100% - (var(--standard-padding) * 2));
+  box-sizing: content-box;
+  padding: var(--standard-padding) 0;
+  position: absolute;
+  z-index: 1;
+  top: 100%;
+  box-shadow: 0px 0px 5px 1px var(--primary-color);
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 0.5rem;
+    border-style: solid;
+    border-color: transparent transparent var(--secondary-color) transparent;
+  }
 }
 
 .focused {
@@ -272,6 +296,10 @@ label:has(> input[type="color"]) > div {
   visibility: hidden;
 }
 
+.small {
+  font-size: 0.75rem;
+}
+
 .yellow {
   color: var(--yellow);
 }
@@ -282,13 +310,17 @@ label:has(> input[type="color"]) > div {
   }
 }
 
+@media (max-width: 768px) {
+  :root {
+    --sidebar-width: 3rem;
+  }
+}
+
 @keyframes fade-in {
   from {
     opacity: 0;
-    transform: translateY(-10px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }

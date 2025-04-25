@@ -1,9 +1,9 @@
 import { configureStore } from "@reduxjs/toolkit";
 
-import textSettingsReducer from "./textSettings/textSettingsSlice";
+import controlsReducer from "./controls/controlsSlice";
 
 export const store = configureStore({
   reducer: {
-    textSettings: textSettingsReducer,
+    controls: controlsReducer,
   },
 });

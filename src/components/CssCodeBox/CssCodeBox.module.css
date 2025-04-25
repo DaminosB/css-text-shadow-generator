@@ -1,7 +1,0 @@
-.codeBox span:not(:first-of-type):not(:last-of-type)::after {
-  content: "\A";
-}
-
-.codeBox span.incremented {
-  margin-left: 2rem;
-}

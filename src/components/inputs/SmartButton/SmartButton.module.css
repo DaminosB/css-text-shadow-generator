@@ -1,0 +1,20 @@
+.label {
+  overflow: hidden;
+}
+
+.checkbox {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: var(--standard-padding);
+  max-width: 100%;
+}
+
+.checkbox > button {
+  transition: var(--fast-transition) var(--default-animation);
+}
+
+.checkbox > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

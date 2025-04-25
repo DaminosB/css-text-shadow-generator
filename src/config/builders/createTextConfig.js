@@ -7,12 +7,13 @@ import {
   faPaintBrush,
   faTextHeight,
   faFont,
-  faChevronDown,
-  faChevronUp,
 } from "@fortawesome/free-solid-svg-icons";
 
 const createTextConfig = () => {
-  const inputsPattern = new InputPattern("text-config");
+  const inputsPattern = new InputPattern(
+    "general-settings",
+    "General settings"
+  );
   inputsPattern
     .addTextInput("userText", "Type your text here")
     .addNumericInput("fontSize", {
@@ -26,30 +27,43 @@ const createTextConfig = () => {
     })
     .addColorInput("backgroundColor", {
       defaultValue: "#FFFFFF",
-      labelText: "background color",
+      labelText: "background",
       icon: faFillDrip,
       format: "hexa",
     })
     .addColorInput("textColor", {
       defaultValue: "#000000",
-      labelText: "text color",
+      labelText: "text",
       icon: faPaintBrush,
       format: "hexa",
     })
     .addSelectInput("textFont", {
       defaultValue: "montserrat",
-      labelText: "text font",
+      labelText: "font",
       icon: faFont,
       list: Object.entries(fontLibrary).map(([fontLabel, font]) => ({
         ...font,
         label: fontLabel,
       })),
-    })
-    .addBoolean("open", {
-      value: true,
-      trigger: "click",
-      icons: { on: faChevronDown, off: faChevronUp },
     });
+  // .addBoolean("pinned", {
+  //   labelText: "Pin",
+  //   value: false,
+  //   trigger: "click",
+  //   icons: { on: faThumbtack, off: faThumbTackSlash },
+  // })
+  // .addBoolean("horizontal", {
+  //   labelText: "Change display",
+  //   value: true,
+  //   icons: { on: faChevronLeft, off: faChevronDown },
+  //   trigger: "click",
+  // })
+  // .addBoolean("open", {
+  //   labelText: "close",
+  //   value: true,
+  //   trigger: "click",
+  //   icon: faXmark,
+  // });
 
   return inputsPattern.data;
 };

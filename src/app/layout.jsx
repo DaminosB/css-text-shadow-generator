@@ -18,9 +18,6 @@ export default function RootLayout({ children }) {
             html {
               font-family: ${fontLibrary.manrope.style.fontFamily};
             }
-            pre {
-              font-family: ${fontLibrary.cutiveMono.style.fontFamily};
-            }
           `}
         </style>
       </head>

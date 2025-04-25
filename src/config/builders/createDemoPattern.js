@@ -2,11 +2,9 @@ import createShadow from "@/config/builders/createShadow";
 import createTextConfig from "@/config/builders/createTextConfig";
 
 import DemoPattern from "@/config/classes/DemoPattern";
+import createInitialState from "./createInitialState";
 
-const initialState = {
-  textConfig: createTextConfig(),
-  shadows: [createShadow("demo-shadow", {})],
-};
+const initialState = createInitialState();
 
 const demoPattern = new DemoPattern(initialState);
 demoPattern
@@ -14,11 +12,10 @@ demoPattern
     {
       alignment: "left",
       text: "Type something cool",
-      targetId:
-        demoPattern.currentState.textConfig.inputs.userText.inputContainerId,
+      targetId: demoPattern.currentState.text.id,
     },
     {
-      path: ["textConfig", "inputs", "userText"],
+      path: ["text"],
       key: "value",
       newValue: "Something cool",
     }
@@ -27,25 +24,39 @@ demoPattern
     {
       alignment: "right",
       text: "Pump up the characters size",
-      targetId:
-        demoPattern.currentState.textConfig.inputs.fontSize.inputContainerId,
+      targetId: `labelFor-${demoPattern.currentState.items.data.generalSettings.data[0].inputs.fontSize.inputId}`,
     },
     {
-      path: ["textConfig", "inputs", "fontSize"],
+      path: [
+        "items",
+        "data",
+        "generalSettings",
+        "data",
+        0,
+        "inputs",
+        "fontSize",
+      ],
       key: "value",
       newValue: 100,
-    }
+    },
+    { path: ["items"], key: "isOpen", newValue: true }
   )
   .addStep(
     {
       alignment: "right",
       text: "Pick your backdrop",
-      targetId:
-        demoPattern.currentState.textConfig.inputs.backgroundColor
-          .inputContainerId,
+      targetId: `labelFor-${demoPattern.currentState.items.data.generalSettings.data[0].inputs.backgroundColor.inputId}`,
     },
     {
-      path: ["textConfig", "inputs", "backgroundColor"],
+      path: [
+        "items",
+        "data",
+        "generalSettings",
+        "data",
+        0,
+        "inputs",
+        "backgroundColor",
+      ],
       key: "value",
       newValue: "#5F67A9",
     }
@@ -54,11 +65,18 @@ demoPattern
     {
       alignment: "right",
       text: "Make your letters pop",
-      targetId:
-        demoPattern.currentState.textConfig.inputs.textColor.inputContainerId,
+      targetId: `labelFor-${demoPattern.currentState.items.data.generalSettings.data[0].inputs.textColor.inputId}`,
     },
     {
-      path: ["textConfig", "inputs", "textColor"],
+      path: [
+        "items",
+        "data",
+        "generalSettings",
+        "data",
+        0,
+        "inputs",
+        "textColor",
+      ],
       key: "value",
       newValue: "#EAEAE5",
     }
@@ -67,37 +85,74 @@ demoPattern
     {
       alignment: "right",
       text: "Choose a fresh font",
-      targetId:
-        demoPattern.currentState.textConfig.inputs.textFont.inputContainerId,
+      targetId: `labelFor-${demoPattern.currentState.items.data.generalSettings.data[0].inputs.textFont.inputId}`,
     },
     {
-      path: ["textConfig", "inputs", "textFont"],
+      path: [
+        "items",
+        "data",
+        "generalSettings",
+        "data",
+        0,
+        "inputs",
+        "textFont",
+      ],
       key: "value",
       newValue: "comfortaa",
     }
   )
-  .addStep({
-    alignment: "right",
-    text: "Link the shadow offsets",
-    targetId:
-      demoPattern.currentState.shadows[0].inputs.shadowLength.link
-        .inputContainerId,
-  })
+  .addStep(
+    {
+      alignment: "right",
+      text: "Link the shadow offsets",
+      targetId:
+        demoPattern.currentState.items.data.layers.data[0].inputs.shadowLength
+          .link.inputId,
+    },
+    {
+      path: ["items", "data", "layers"],
+      key: "isOpen",
+      newValue: true,
+    },
+    {
+      path: ["items", "data", "generalSettings"],
+      key: "isOpen",
+      newValue: false,
+    }
+  )
   .addStep(
     {
       alignment: "right",
       text: "And slide them together",
-      targetId:
-        demoPattern.currentState.shadows[0].inputs.shadowLength
-          .inputContainerId,
+      targetId: `containerFor-${demoPattern.currentState.items.data.layers.data[0].inputs.shadowLength.inputId}`,
     },
     {
-      path: ["shadows", 0, "inputs", "shadowLength", "inputs", "xShadowLength"],
+      path: [
+        "items",
+        "data",
+        "layers",
+        "data",
+        0,
+        "inputs",
+        "shadowLength",
+        "inputs",
+        "xShadowLength",
+      ],
       key: "value",
       newValue: 30,
     },
     {
-      path: ["shadows", 0, "inputs", "shadowLength", "inputs", "yShadowLength"],
+      path: [
+        "items",
+        "data",
+        "layers",
+        "data",
+        0,
+        "inputs",
+        "shadowLength",
+        "inputs",
+        "yShadowLength",
+      ],
       key: "value",
       newValue: 30,
     }
@@ -107,11 +162,20 @@ demoPattern
       alignment: "right",
       text: "Or unlink the shadow offsets",
       targetId:
-        demoPattern.currentState.shadows[0].inputs.shadowLength.link
-          .inputContainerId,
+        demoPattern.currentState.items.data.layers.data[0].inputs.shadowLength
+          .link.inputId,
     },
     {
-      path: ["shadows", 0, "inputs", "shadowLength", "link"],
+      path: [
+        "items",
+        "data",
+        "layers",
+        "data",
+        0,
+        "inputs",
+        "shadowLength",
+        "link",
+      ],
       key: "value",
       newValue: false,
     }
@@ -120,30 +184,47 @@ demoPattern
     {
       alignment: "right",
       text: "And slide them indepedently",
-      targetId:
-        demoPattern.currentState.shadows[0].inputs.shadowLength
-          .inputContainerId,
+      targetId: `containerFor-${demoPattern.currentState.items.data.layers.data[0].inputs.shadowLength.inputId}`,
     },
     {
-      path: ["shadows", 0, "inputs", "shadowLength", "inputs", "xShadowLength"],
+      path: [
+        "items",
+        "data",
+        "layers",
+        "data",
+        0,
+        "inputs",
+        "shadowLength",
+        "inputs",
+        "xShadowLength",
+      ],
       key: "value",
       newValue: -10,
     },
     {
-      path: ["shadows", 0, "inputs", "shadowLength", "inputs", "yShadowLength"],
+      path: [
+        "items",
+        "data",
+        "layers",
+        "data",
+        0,
+        "inputs",
+        "shadowLength",
+        "inputs",
+        "yShadowLength",
+      ],
       key: "value",
-      newValue: -45,
+      newValue: 45,
     }
   )
   .addStep(
     {
       alignment: "right",
       text: "Blur it out",
-      targetId:
-        demoPattern.currentState.shadows[0].inputs.blurRadius.inputContainerId,
+      targetId: `labelFor-${demoPattern.currentState.items.data.layers.data[0].inputs.blurRadius.inputId}`,
     },
     {
-      path: ["shadows", 0, "inputs", "blurRadius"],
+      path: ["items", "data", "layers", "data", 0, "inputs", "blurRadius"],
       key: "value",
       newValue: 15,
     }
@@ -151,24 +232,30 @@ demoPattern
   .addStep({
     alignment: "right",
     text: "Match the text's color",
-    targetId:
-      demoPattern.currentState.shadows[0].inputs.shadowColor.toggleOption
-        .inputContainerId,
+    targetId: `labelFor-${demoPattern.currentState.items.data.layers.data[0].inputs.shadowColor.toggleOption.inputId}`,
   })
   .addStep(
     {
       alignment: "right",
       text: "...Or choose your own!",
-      targetId:
-        demoPattern.currentState.shadows[0].inputs.shadowColor.inputContainerId,
+      targetId: `labelFor-${demoPattern.currentState.items.data.layers.data[0].inputs.shadowColor.inputId}`,
     },
     {
-      path: ["shadows", 0, "inputs", "shadowColor", "toggleOption"],
+      path: [
+        "items",
+        "data",
+        "layers",
+        "data",
+        0,
+        "inputs",
+        "shadowColor",
+        "toggleOption",
+      ],
       key: "value",
       newValue: false,
     },
     {
-      path: ["shadows", 0, "inputs", "shadowColor"],
+      path: ["items", "data", "layers", "data", 0, "inputs", "shadowColor"],
       key: "value",
       newValue: "#E0DC4F",
     }
@@ -180,29 +267,52 @@ demoPattern
       targetId: "append-button",
     },
     {
-      path: [],
-      key: "shadows",
-      newValue: [...demoPattern.currentState.shadows, createShadow()],
+      path: ["items", "data", "layers"],
+      key: "data",
+      newValue: [
+        ...demoPattern.currentState.items.data.layers.data,
+        createShadow(),
+      ],
     }
   )
   .addStep(
     {
       alignment: "right",
       text: "Set it as you like",
-      targetId: demoPattern.currentState.shadows[1].id,
+      targetId: demoPattern.currentState.items.data.layers.data[1].id,
     },
     {
-      path: ["shadows", 1, "inputs", "shadowLength", "inputs", "xShadowLength"],
+      path: [
+        "items",
+        "data",
+        "layers",
+        "data",
+        1,
+        "inputs",
+        "shadowLength",
+        "inputs",
+        "xShadowLength",
+      ],
       key: "value",
       newValue: 5,
     },
     {
-      path: ["shadows", 1, "inputs", "shadowLength", "inputs", "yShadowLength"],
+      path: [
+        "items",
+        "data",
+        "layers",
+        "data",
+        1,
+        "inputs",
+        "shadowLength",
+        "inputs",
+        "yShadowLength",
+      ],
       key: "value",
       newValue: 5,
     },
     {
-      path: ["shadows", 1, "inputs", "blurRadius"],
+      path: ["items", "data", "layers", "data", 1, "inputs", "blurRadius"],
       key: "value",
       newValue: 10,
     }
@@ -211,10 +321,19 @@ demoPattern
     {
       alignment: "right",
       text: "Highlight the active layer",
-      targetId: `container-${demoPattern.currentState.shadows[1].controls.highlight.id}`,
+      targetId: `labelFor-${demoPattern.currentState.items.data.layers.data[1].controls.highlight.id}`,
     },
     {
-      path: ["shadows", 1, "controls", "highlight", "config"],
+      path: [
+        "items",
+        "data",
+        "layers",
+        "data",
+        1,
+        "controls",
+        "highlight",
+        "config",
+      ],
       key: "value",
       newValue: true,
     }
@@ -223,15 +342,33 @@ demoPattern
     {
       alignment: "right",
       text: "Toggle the layer's visibility",
-      targetId: `container-${demoPattern.currentState.shadows[1].controls.enable.id}`,
+      targetId: `labelFor-${demoPattern.currentState.items.data.layers.data[1].controls.enable.id}`,
     },
     {
-      path: ["shadows", 1, "controls", "enable", "config"],
+      path: [
+        "items",
+        "data",
+        "layers",
+        "data",
+        1,
+        "controls",
+        "enable",
+        "config",
+      ],
       key: "value",
       newValue: false,
     },
     {
-      path: ["shadows", 1, "controls", "highlight", "config"],
+      path: [
+        "items",
+        "data",
+        "layers",
+        "data",
+        1,
+        "controls",
+        "highlight",
+        "config",
+      ],
       key: "value",
       newValue: false,
     }
@@ -239,18 +376,41 @@ demoPattern
   .addStep({
     alignment: "right",
     text: "Or remove it completely",
-    targetId: `container-${demoPattern.currentState.shadows[1].controls.trashcan.id}`,
+    targetId: `labelFor-${demoPattern.currentState.items.data.layers.data[1].controls.trashcan.id}`,
   })
-  .addStep({
-    alignment: "left",
-    text: "Check the result live",
-    targetId:
-      demoPattern.currentState.textConfig.inputs.userText.inputContainerId,
-  })
-  .addStep({
-    alignment: "left",
-    text: "Copy the CSS code",
-    targetId: "output-box",
-  });
+  .addStep(
+    {
+      alignment: "left",
+      text: "Check the result live",
+      targetId: demoPattern.currentState.text.id,
+    },
+    {
+      path: ["items"],
+      key: "isOpen",
+      newValue: false,
+    }
+  )
+  .addStep(
+    {
+      alignment: "right",
+      text: "Copy the CSS code",
+      targetId: demoPattern.currentState.items.data.output.id,
+    },
+    {
+      path: ["items"],
+      key: "isOpen",
+      newValue: true,
+    },
+    {
+      path: ["items", "data", "layers"],
+      key: "isOpen",
+      newValue: false,
+    },
+    {
+      path: ["items", "data", "output"],
+      key: "isOpen",
+      newValue: true,
+    }
+  );
 
 export default demoPattern.steps;

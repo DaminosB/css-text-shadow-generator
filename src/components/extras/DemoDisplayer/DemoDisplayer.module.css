@@ -1,0 +1,86 @@
+.confirmationBox {
+  position: absolute;
+  padding: 1rem;
+  background-color: var(--primary-color-medium-transparency);
+  z-index: 1;
+  color: var(--secondary-color);
+  transition: var(--fast-transition) var(--default-animation);
+}
+
+.confirmationBox > div:last-of-type {
+  margin-top: 1rem;
+  display: flex;
+  gap: 1rem;
+}
+
+.confirmationBox > div:last-of-type > button {
+  flex: 1;
+  border: var(--default-border);
+  padding: var(--standard-padding);
+  background-color: var(--secondary-color-high-transparency);
+  transition: var(--fast-transition) var(--default-animation);
+}
+
+.confirmationBox > div:last-of-type > button:hover {
+  background-color: transparent;
+}
+
+div:has(> .demoBox) {
+  padding: 1rem;
+  max-width: 25%;
+  max-width: 100%;
+  width: fit-content;
+
+  transition: var(--fast-transition) var(--default-animation);
+}
+
+.demoBox {
+  color: var(--secondary-color);
+  position: relative;
+  max-width: 100%;
+  background-color: var(--primary-color-light-transparency);
+  border: var(--default-border);
+  padding: 0.75rem;
+}
+
+.demoBox > button:first-of-type {
+  position: absolute;
+  bottom: 100%;
+  left: 100%;
+  padding: 0.25rem;
+  color: var(--secondary-color);
+
+  & svg {
+    filter: var(--icon-shadow);
+  }
+}
+
+.demoBox > p {
+  min-height: 1rem;
+}
+
+.demoBox > div {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.demoBox > div > button {
+  margin-left: 1rem;
+  display: inline-flex;
+  gap: var(--standard-padding);
+  align-items: center;
+  transition: var(--fast-transition) var(--default-animation);
+}
+
+.demoBox > div > button svg {
+  font-size: 0.75rem;
+}
+
+@media (max-width: 1023px) {
+  .toogleButton {
+    top: 0;
+    bottom: unset;
+    padding: 1rem;
+  }
+}

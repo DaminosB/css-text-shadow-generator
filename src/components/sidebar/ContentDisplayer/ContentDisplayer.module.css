@@ -1,0 +1,24 @@
+.container {
+  position: relative;
+}
+
+.container > div {
+  height: 100%;
+  overflow-y: auto;
+  scrollbar-color: var(--secondary-color) transparent;
+  scrollbar-gutter: stable;
+  opacity: 0;
+  visibility: hidden;
+  z-index: -1;
+  transition: var(--average-transition) var(--default-animation);
+
+  &:first-child {
+    position: relative;
+  }
+
+  &.active {
+    opacity: 1;
+    visibility: visible;
+    z-index: 1;
+  }
+}

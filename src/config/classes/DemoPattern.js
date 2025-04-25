@@ -1,3 +1,5 @@
+import createShadowsOutput from "@/utils/createShadowsOutput";
+
 export default class DemoPattern {
   constructor(initialState) {
     this.currentState = initialState;
@@ -48,6 +50,14 @@ export default class DemoPattern {
       const { path, key, newValue } = action;
       const target = path.reduce((acc, entry) => acc[entry], this.currentState);
       target[key] = newValue;
+
+      const shouldUpdateOutput = path[2] === "layers";
+
+      if (shouldUpdateOutput) {
+        this.currentState.items.data.output.data = createShadowsOutput(
+          this.currentState.items.data.layers.data
+        );
+      }
     });
 
     const step = { demoConfig, state: structuredClone(this.currentState) };
@@ -55,41 +65,4 @@ export default class DemoPattern {
 
     return this;
   }
-
-  // addStep(demoConfig, ...actions) {
-  //   const requiredDemoFields = ["alignment", "text", "targetId"].filter(
-  //     (field) => !demoConfig[field]
-  //   );
-
-  //   if (requiredDemoFields.length) {
-  //     throw new Error(
-  //       `Missing required fields in demoConfig for step ${
-  //         this.steps.length + 1
-  //       }: ${requiredDemoFields.join(", ")}.`
-  //     );
-  //   }
-
-  //   actions.forEach((action, index) => {
-  //     const requiredActionFields = ["path", "key", "newValue"].filter(
-  //       (field) => action[field] == null
-  //     );
-
-  //     if (requiredActionFields.length) {
-  //       throw new Error(
-  //         `Missing required fields in action #${index + 1} for step ${
-  //           this.steps.length + 1
-  //         }: ${requiredActionFields.join(", ")}.`
-  //       );
-  //     }
-
-  //     const { path, key, newValue } = action;
-  //     const target = path.reduce((acc, entry) => acc[entry], this.currentState);
-  //     target[key] = newValue;
-  //   });
-
-  //   const step = { demoConfig, state: structuredClone(this.currentState) };
-  //   this.steps.push(step);
-
-  //   return this;
-  // }
 }

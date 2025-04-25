@@ -1,0 +1,63 @@
+.inputDisplayer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--standard-padding);
+
+  &:not(:has(.inputGroup)) {
+    padding: 0 var(--standard-padding);
+  }
+}
+
+.inputDisplayer button {
+  font-size: 1.25rem;
+}
+
+.inputContainer {
+  transition: var(--fast-transition) var(--default-animation);
+  height: 100%;
+
+  &.open {
+    max-height: 100vh;
+    opacity: 1;
+  }
+
+  &.closed {
+    max-height: 0;
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--standard-padding);
+
+  & > div {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  & > fieldset {
+    display: flex;
+    flex-direction: column;
+    transition: var(--fast-transition) var(--default-animation);
+    padding: 0.25rem;
+    margin: 0.25rem;
+    position: relative;
+    gap: var(--gap-between-inputs);
+    border: var(--default-border);
+
+    & > legend {
+      margin: 0 auto;
+      padding: 0 var(--standard-padding);
+      transition: inherit;
+    }
+  }
+
+  &.grouped > fieldset {
+    margin: var(--standard-padding);
+    gap: var(--standard-padding);
+    background-color: var(--secondary-color-high-transparency);
+  }
+}
