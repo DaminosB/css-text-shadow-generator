@@ -9,12 +9,12 @@ import { useSelector, useDispatch } from "react-redux";
 import { updateState } from "@/features/controls/controlsSlice";
 
 const TextPreview = ({ path }) => {
-  const { modaleContent } = useContext(WorkspaceCtxt);
+  const { modalContent } = useContext(WorkspaceCtxt);
   const { items, text } = useSelector(({ controls }) => controls);
   const output = useMemo(() => items.data.output, [items.data.output]);
   const generalSettingsData = items.data.generalSettings.data[0];
 
-  const isDemoMode = useMemo(() => modaleContent === "demo", [modaleContent]);
+  const isDemoMode = useMemo(() => modalContent === "demo", [modalContent]);
 
   const dispatch = useDispatch();
 

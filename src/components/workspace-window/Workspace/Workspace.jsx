@@ -2,7 +2,7 @@
 
 import styles from "./Workspace.module.css";
 
-import { useState, createContext } from "react";
+import { useState, createContext, useCallback } from "react";
 export const WorkspaceCtxt = createContext();
 
 import { Provider } from "react-redux";
@@ -14,9 +14,24 @@ import DemoDisplayer from "../../extras/DemoDisplayer/DemoDisplayer";
 import About from "@/components/extras/About/About";
 
 const Workspace = () => {
-  const [modaleContent, setModaleContent] = useState(null);
+  const [modalContent, setModaleContent] = useState(null);
 
-  const contextValues = { modaleContent, setModaleContent };
+  const manageModale = useCallback(
+    (content, show) => {
+      const modal = document.getElementById(content);
+
+      if (show) {
+        modal.showModal();
+        setModaleContent(content);
+      } else {
+        modal.close();
+        setModaleContent(null);
+      }
+    },
+    [setModaleContent]
+  );
+
+  const contextValues = { modalContent, setModaleContent, manageModale };
 
   return (
     <Provider store={store}>
