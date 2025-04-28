@@ -202,6 +202,31 @@ button:disabled {
   color: var(--secondary-color-medium-transparency);
 }
 
+dialog {
+  position: absolute;
+  background-color: var(--secondary-color-light-transparency);
+  z-index: 1;
+  transition: var(--fast-transition) var(--default-animation);
+  top: 50%;
+  left: 50%;
+
+  opacity: 0;
+  visibility: hidden;
+  transform: translate(-50%, -50%) scale(0.75);
+  filter: blur(10px);
+
+  &[open] {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, -50%) scale(1);
+    filter: blur(0px);
+  }
+
+  &::backdrop {
+    background: none;
+  }
+}
+
 h1 {
   font-size: 1.5rem;
   color: var(--secondary-color);
