@@ -2,8 +2,6 @@ const adjustBoxPosition = (x, y, boxSize, avoidRect) => {
   let adjustedX = Math.max(0, Math.min(x, window.innerWidth - boxSize.width));
   let adjustedY = Math.max(0, Math.min(y, window.innerHeight - boxSize.height));
 
-  // console.log(x, boxSize.width);
-
   if (avoidRect) {
     const isOverlappingX =
       (adjustedX >= avoidRect.left && adjustedX < avoidRect.right) ||
