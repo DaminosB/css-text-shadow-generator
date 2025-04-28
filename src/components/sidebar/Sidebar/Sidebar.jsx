@@ -24,7 +24,7 @@ import ContentDisplayer from "../ContentDisplayer/ContentDisplayer";
 import SmartButton from "@/components/inputs/SmartButton/SmartButton";
 
 const Sidebar = ({ path }) => {
-  const { setModaleContent, modaleContent } = useContext(WorkspaceCtxt);
+  const { manageModale } = useContext(WorkspaceCtxt);
   const { isOpen, isPinned, data } = useSelector((store) =>
     path.reduce((acc, entry) => acc[entry], store.controls)
   );
@@ -35,21 +35,20 @@ const Sidebar = ({ path }) => {
       let newValue;
 
       switch (e.type) {
-        case "mouseenter":
-          newValue = true;
+        case "pointerenter":
+          if (e.pointerType === "mouse") newValue = true;
+
           break;
 
-        case "mouseleave":
-          const [header] = document.getElementsByTagName("Header");
-          const headerRect = header.getBoundingClientRect();
+        case "pointerleave":
+          if (e.pointerType === "mouse") {
+            const sideBarRect = e.currentTarget.getBoundingClientRect();
+            const isOnSideBar =
+              e.clientX > Math.round(sideBarRect.left) &&
+              e.clientX < Math.round(sideBarRect.right);
 
-          const isOnHeader =
-            e.clientX > Math.round(headerRect.left) &&
-            e.clientX < Math.round(headerRect.right) &&
-            e.clientY > Math.round(headerRect.top) &&
-            e.clientY < Math.round(headerRect.bottom);
-
-          newValue = isOnHeader;
+            newValue = isOnSideBar;
+          }
 
           break;
 
@@ -63,9 +62,11 @@ const Sidebar = ({ path }) => {
           break;
       }
 
-      dispatch(updateState({ path, key: "isOpen", value: newValue }));
+      if (newValue !== undefined) {
+        dispatch(updateState({ path, key: "isOpen", value: newValue }));
+      }
     },
-    [path, isOpen, dispatch, modaleContent]
+    [path, isOpen, dispatch]
   );
 
   const togglePin = useCallback(() => {
@@ -126,18 +127,12 @@ const Sidebar = ({ path }) => {
     });
   }, [dispatch, data, path, toggleItems, isOpen]);
 
-  const openDemoMode = useCallback(
+  const openModale = useCallback(
     (e) => {
-      setModaleContent(e.currentTarget.name);
-
-      document.activeElement.blur();
+      manageModale(e.currentTarget.name, true);
     },
-    [setModaleContent]
+    [manageModale]
   );
-
-  const openAboutModale = useCallback(() => {
-    setModaleContent("about");
-  }, [setModaleContent]);
 
   return (
     <div className={styles.sidebar}>
@@ -146,8 +141,8 @@ const Sidebar = ({ path }) => {
           isPinned ? styles.pinned : ""
         }`}
         data-path={path}
-        onMouseEnter={toggleSidebar}
-        onMouseLeave={toggleSidebar}
+        onPointerEnter={toggleSidebar}
+        onPointerLeave={toggleSidebar}
       >
         <div>
           <SmartButton
@@ -213,7 +208,7 @@ const Sidebar = ({ path }) => {
               <button
                 className={styles.auxButton}
                 name="demo"
-                onClick={openDemoMode}
+                onClick={openModale}
               >
                 <div>
                   <FontAwesomeIcon icon={faPlay} />
@@ -239,7 +234,8 @@ const Sidebar = ({ path }) => {
               <button
                 className={styles.auxButton}
                 name={"about"}
-                onClick={openAboutModale}
+                // onClick={openAboutModale}
+                onClick={openModale}
               >
                 <div>
                   <FontAwesomeIcon icon={faQuestion} />
