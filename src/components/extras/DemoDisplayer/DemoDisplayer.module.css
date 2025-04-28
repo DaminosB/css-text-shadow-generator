@@ -1,10 +1,25 @@
 .confirmationBox {
   position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   padding: 1rem;
   background-color: var(--primary-color-medium-transparency);
   z-index: 1;
+  /* display: flex;
+  flex-direction: column; */
   color: var(--secondary-color);
   transition: var(--fast-transition) var(--default-animation);
+
+  /* & > .confirmationBox {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  &[open] > .confirmationBox {
+    opacity: 1;
+    visibility: visible;
+  } */
 }
 
 .confirmationBox > div:last-of-type {
@@ -25,18 +40,23 @@
   background-color: transparent;
 }
 
-div:has(> .demoBox) {
+/* div:has(> .demoBox) {
   padding: 1rem;
   max-width: 25%;
   max-width: 100%;
   width: fit-content;
 
   transition: var(--fast-transition) var(--default-animation);
-}
+} */
 
 .demoBox {
   color: var(--secondary-color);
-  position: relative;
+  overflow: visible;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   max-width: 100%;
   background-color: var(--primary-color-light-transparency);
   border: var(--default-border);
@@ -59,13 +79,13 @@ div:has(> .demoBox) {
   min-height: 1rem;
 }
 
-.demoBox > div {
+.demoBox > div:not(.confirmationBox) {
   margin-top: 1rem;
   display: flex;
   justify-content: flex-end;
 }
 
-.demoBox > div > button {
+.demoBox > div:not(.confirmationBox) > button {
   margin-left: 1rem;
   display: inline-flex;
   gap: var(--standard-padding);
@@ -73,7 +93,7 @@ div:has(> .demoBox) {
   transition: var(--fast-transition) var(--default-animation);
 }
 
-.demoBox > div > button svg {
+.demoBox > div:not(.confirmationBox) > button svg {
   font-size: 0.75rem;
 }
 

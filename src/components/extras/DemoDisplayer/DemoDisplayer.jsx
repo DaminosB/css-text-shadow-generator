@@ -23,29 +23,20 @@ import {
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 
-import Modale from "@/components/wrappers/Modale/Modale";
-
-import parse from "@/utils/parse";
 import adjustBoxPosition from "@/utils/adjustBoxPosition";
 
 const DemoDisplayer = () => {
-  const { modaleContent, setModaleContent } = useContext(WorkspaceCtxt);
+  const { modalContent, manageModale } = useContext(WorkspaceCtxt);
 
-  const isDemoMode = useMemo(() => modaleContent === "demo", [modaleContent]);
-
+  const isDemoMode = useMemo(() => modalContent === "demo", [modalContent]);
   const [demoStep, setDemoStep] = useState(0);
-  const [showConfirmationBox, setShowConfirmationBox] = useState(false);
-
-  const controls = useSelector((state) => state.controls);
-
-  const dispatch = useDispatch();
-
-  const demoBoxRef = useRef(null);
-  const confirmationBoxRef = useRef(null);
-
   const currentStep = useMemo(() => demoPattern[demoStep], [demoStep]);
 
+  const controls = useSelector((state) => state.controls);
+  const dispatch = useDispatch();
   const cachedState = useRef(controls);
+
+  const demoBoxRef = useRef(null);
 
   const posDemoBox = useCallback((currentStep) => {
     const { demoConfig } = currentStep;
@@ -108,6 +99,7 @@ const DemoDisplayer = () => {
       boxSize,
       clonedTargetRect
     ));
+
     demoBox.style.transform = `translate(${newX}px, ${newY}px)`;
   }, []);
 
@@ -118,14 +110,13 @@ const DemoDisplayer = () => {
 
     focusedContainer.classList.remove("focused");
     dispatch(replaceState(cachedState.current));
-    setModaleContent(null);
-  }, [currentStep, dispatch, setModaleContent]);
+    manageModale("demo", false);
+  }, [currentStep, dispatch, manageModale]);
 
   const navigateDemoMode = useCallback(
     (newIndex) => {
       setDemoStep(newIndex);
-      const newStep = demoPattern[newIndex];
-      dispatch(replaceState(newStep.state));
+
       requestAnimationFrame(() => {
         const currentFocusedContainer = document.getElementById(
           currentStep.demoConfig.targetId
@@ -139,181 +130,119 @@ const DemoDisplayer = () => {
         if (nextFocusedContainer) nextFocusedContainer.classList.add("focused");
       });
     },
-    [currentStep, dispatch]
+    [currentStep]
   );
 
-  const displayConfirmationBox = useCallback(
-    (x, y, confirmationBox) => {
-      const boxSize = {
-        width: confirmationBox.offsetWidth,
-        height: confirmationBox.offsetHeight,
-      };
+  const handleOnClick = useCallback((e) => {
+    const box = e.currentTarget;
 
-      let newX = x - boxSize.width / 2;
-      let newY = y - boxSize.height / 2;
+    const boxRect = box.getBoundingClientRect();
 
-      ({ adjustedX: newX, adjustedY: newY } = adjustBoxPosition(
-        newX,
-        newY,
-        boxSize
-      ));
+    const isOutside =
+      e.clientX < Math.round(boxRect.left) ||
+      e.clientX > Math.round(boxRect.right) ||
+      e.clientY < Math.round(boxRect.top) ||
+      e.clientY > Math.round(boxRect.bottom);
 
-      confirmationBox.style.transform = `translate(${newX}px, ${newY}px)`;
+    if (isOutside) {
+      box.animate(
+        [
+          { backgroundColor: "var(--primary-color)" },
+          { transform: `translate(${boxRect.x - 20}px, ${boxRect.y}px)` },
+          { transform: `translate(${boxRect.x + 20}px, ${boxRect.y}px)` },
+          { transform: `translate(${boxRect.x - 10}px, ${boxRect.y}px)` },
+          { transform: `translate(${boxRect.x + 10}px, ${boxRect.y}px)` },
+          { transform: `translate(${boxRect.x - 5}px, ${boxRect.y}px)` },
+          { transform: `translate(${boxRect.x + 5}px, ${boxRect.y}px)` },
+          { transform: `translate(${boxRect.x}px, ${boxRect.y}px)` },
+        ],
+        { duration: 1000, iterations: 1 }
+      );
+    }
+  }, []);
 
-      setShowConfirmationBox(true);
-    },
-    [setShowConfirmationBox]
-  );
-
-  const handleDisplayConfirmationBox = useCallback(
-    (e) => {
-      const confirmationBox = confirmationBoxRef.current;
-
-      displayConfirmationBox(e.clientX, e.clientY, confirmationBox);
-    },
-    [displayConfirmationBox]
-  );
-
-  const handleDemoWindowClick = useCallback(
+  const handleCloseDemoMode = useCallback(
     (e) => {
       e.stopPropagation();
-      setShowConfirmationBox(false);
+      closeDemoMode();
     },
-    [setShowConfirmationBox]
-  );
-
-  const handleConfirmationBoxClick = useCallback(
-    (e) => {
-      setShowConfirmationBox(false);
-      if (parse(e.currentTarget.value)) closeDemoMode();
-    },
-    [setShowConfirmationBox, closeDemoMode]
+    [closeDemoMode]
   );
 
   useEffect(() => {
-    if (!isDemoMode) return;
+    if (isDemoMode) {
+      posDemoBox(currentStep);
 
-    posDemoBox(currentStep);
-    dispatch(replaceState(currentStep.state));
+      dispatch(replaceState(currentStep.state));
 
-    const controller = new AbortController();
-    const { signal } = controller;
+      const controller = new AbortController();
+      const { signal } = controller;
 
-    window.addEventListener(
-      "keydown",
-      (e) => {
-        demoBoxRef.current.focus();
+      window.addEventListener(
+        "keydown",
+        (e) => {
+          switch (e.code) {
+            case "ArrowRight":
+              if (demoStep < demoPattern.length - 1)
+                navigateDemoMode(demoStep + 1);
+              break;
 
-        const confirmationBox = confirmationBoxRef.current;
+            case "ArrowLeft":
+              if (demoStep > 0) navigateDemoMode(demoStep - 1);
+              break;
 
-        switch (e.code) {
-          case "ArrowRight":
-            if (demoStep < demoPattern.length - 1) {
-              navigateDemoMode(demoStep + 1);
-            } else {
-              displayConfirmationBox(
-                window.innerWidth / 2,
-                window.innerHeight / 2,
-                confirmationBox
-              );
-            }
-            break;
-
-          case "ArrowLeft":
-            if (demoStep > 0) navigateDemoMode(demoStep - 1);
-            break;
-
-          case "Escape":
-            if (showConfirmationBox) {
-              setShowConfirmationBox(false);
-            } else {
-              displayConfirmationBox(
-                window.innerWidth / 2,
-                window.innerHeight / 2,
-                confirmationBox
-              );
-            }
-            break;
-
-          case "Enter":
-            if (showConfirmationBox) {
-              setShowConfirmationBox(false);
+            case "Escape":
               closeDemoMode();
-            }
-            break;
+              break;
 
-          default:
-            break;
-        }
-      },
-      { signal }
-    );
+            default:
+              break;
+          }
+        },
+        { signal }
+      );
 
-    return () => controller.abort();
+      return () => controller.abort();
+    }
   }, [
+    controls,
+    dispatch,
     isDemoMode,
     demoStep,
-    showConfirmationBox,
     currentStep,
-    displayConfirmationBox,
     closeDemoMode,
     navigateDemoMode,
     posDemoBox,
-    dispatch,
   ]);
 
   return (
-    <>
-      <Modale
-        darkBackground={showConfirmationBox}
-        onClick={handleDisplayConfirmationBox}
-        isOpen={isDemoMode}
-      >
-        <div
-          className={`${styles.confirmationBox} ${
-            showConfirmationBox ? "" : "hidden"
-          } focused`}
-          ref={confirmationBoxRef}
-          onClick={(e) => e.stopPropagation()}
+    <dialog
+      id="demo"
+      ref={demoBoxRef}
+      className={`${styles.demoBox} focused`}
+      onClick={handleOnClick}
+    >
+      <button onClick={handleCloseDemoMode}>
+        <FontAwesomeIcon icon={faXmark} />
+      </button>
+      <p>{demoStep !== null && currentStep.demoConfig.text}</p>
+      <div>
+        <button
+          className={demoStep === 0 ? "hidden" : ""}
+          onClick={() => navigateDemoMode(demoStep - 1)}
         >
-          <div>
-            <h3>Leave the demo mode?</h3>
-          </div>
-          <div>
-            <button value={true} onClick={handleConfirmationBoxClick}>
-              <FontAwesomeIcon icon={faCheck} /> <span>Yes</span>
-            </button>
-            <button value={false} onClick={handleConfirmationBoxClick}>
-              <FontAwesomeIcon icon={faXmark} /> <span>No</span>
-            </button>
-          </div>
-        </div>
-        <div ref={demoBoxRef} onClick={handleDemoWindowClick}>
-          <div className={`${styles.demoBox} focused`}>
-            <button onClick={() => closeDemoMode()}>
-              <FontAwesomeIcon icon={faXmark} />
-            </button>
-            <p>{demoStep !== null && currentStep.demoConfig.text}</p>
-            <div>
-              <button
-                className={demoStep === 0 ? "hidden" : ""}
-                onClick={() => navigateDemoMode(demoStep - 1)}
-              >
-                <FontAwesomeIcon icon={faChevronLeft} />
-                <span>Prev</span>
-              </button>
-              <button
-                className={demoStep === demoPattern.length - 1 ? "hidden" : ""}
-                onClick={() => navigateDemoMode(demoStep + 1)}
-              >
-                <span>Next</span>
-                <FontAwesomeIcon icon={faChevronRight} />
-              </button>
-            </div>
-          </div>
-        </div>
-      </Modale>
-    </>
+          <FontAwesomeIcon icon={faChevronLeft} />
+          <span>Prev</span>
+        </button>
+        <button
+          className={demoStep === demoPattern.length - 1 ? "hidden" : ""}
+          onClick={() => navigateDemoMode(demoStep + 1)}
+        >
+          <span>Next</span>
+          <FontAwesomeIcon icon={faChevronRight} />
+        </button>
+      </div>
+    </dialog>
   );
 };
 
