@@ -1,18 +1,25 @@
 import styles from "./SelectInput.module.css";
 
-import { useMemo, useState, useRef } from "react";
-
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheckSquare, faChevronUp } from "@fortawesome/free-solid-svg-icons";
+import { useMemo, useCallback, useState, useRef } from "react";
 
 import SmartButton from "../SmartButton/SmartButton";
 import HeadingIcon from "@/components/headers/HeadingIcon/HeadingIcon";
 
-import { faSquare } from "@fortawesome/free-regular-svg-icons";
+import { Icons, iconsList } from "@/assets/icons/iconsLibrary";
+const { CaretUp } = Icons;
 
 import parse from "@/utils/parse";
 
-const SelectInput = ({ inputId, name, label, icon, value, setValue, list }) => {
+const SelectInput = ({
+  inputId,
+  name,
+  label,
+  icon,
+  value,
+  setValue,
+  list,
+  commit,
+}) => {
   const filters = useMemo(
     () =>
       list.reduce((acc, item) => {
@@ -24,20 +31,20 @@ const SelectInput = ({ inputId, name, label, icon, value, setValue, list }) => {
 
   const [activeFilters, setActiveFilters] = useState(filters);
 
-  const lastClickedItem = useRef(value);
-
-  const toggleIsOpen = (e) => {
-    e.currentTarget.focus();
-  };
-
   const selectedItem = useMemo(
     () => list.find((item) => item.label === value),
     [list, value]
   );
 
-  const resetValue = () => {
+  const lastClickedItem = useRef(value);
+
+  const toggleIsOpen = useCallback((e) => {
+    e.currentTarget.focus();
+  }, []);
+
+  const resetValue = useCallback(() => {
     setValue(lastClickedItem.current);
-  };
+  }, [setValue]);
 
   return (
     <label
@@ -52,7 +59,7 @@ const SelectInput = ({ inputId, name, label, icon, value, setValue, list }) => {
         <span className={`${selectedItem.className}`}>{selectedItem.name}</span>
 
         <button id={inputId} name={name} onClick={toggleIsOpen}>
-          <FontAwesomeIcon icon={faChevronUp} />
+          <CaretUp />
         </button>
       </div>
       <div className={`${styles.selectionWindow} extension-bottom`}>
@@ -89,7 +96,7 @@ const SelectInput = ({ inputId, name, label, icon, value, setValue, list }) => {
                 inputId={checkboxId}
                 inputContainerId={checkBoxContainerId}
                 name={currentFilter}
-                icons={{ on: faCheckSquare, off: faSquare }}
+                icons={{ on: iconsList.CheckSquare, off: iconsList.Square }}
                 onClick={toggleFilters}
                 value={isActiveFilter}
                 text={currentFilter}
@@ -111,23 +118,25 @@ const SelectInput = ({ inputId, name, label, icon, value, setValue, list }) => {
 
               const handleOnClick = (e) => {
                 document.activeElement.blur();
+                commit(lastClickedItem.current, item.label);
                 lastClickedItem.current = item.label;
               };
 
               const isActive = item.label === lastClickedItem.current;
 
               return (
-                <button
+                <input
+                  type="button"
+                  value={item.name}
                   key={item.id}
                   id={item.id}
                   className={isActive ? styles.active : ""}
                   title={item.name}
                   style={item.style}
+                  tabIndex={0}
                   onMouseOver={handleOnMouseOver}
                   onClick={handleOnClick}
-                >
-                  {item.name}
-                </button>
+                />
               );
             })}
         </div>

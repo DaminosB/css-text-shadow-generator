@@ -1,0 +1,18 @@
+.container {
+  transition: var(--fast-transition) var(--default-animation);
+  /* animation: var(--fade-in-animation); */
+  box-shadow: 0px 0px 10px 3px var(--primary-color);
+  max-height: 100vh;
+  transform-origin: top;
+
+  &.removed {
+    visibility: hidden;
+    opacity: 0;
+    margin-top: -2.5rem;
+  }
+}
+
+.container > div:last-of-type {
+  animation: var(--appearance-animation);
+  width: 100%;
+}

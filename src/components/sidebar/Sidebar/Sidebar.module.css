@@ -17,6 +17,7 @@
   display: flex;
   flex-direction: column;
   transition: var(--fast-transition) var(--default-animation);
+  backdrop-filter: blur(5px);
 
   &.open,
   &.pinned,
@@ -30,6 +31,10 @@
       opacity: 1;
       visibility: visible;
     }
+  }
+
+  &.open {
+    box-shadow: 0px 0px 25px 15px var(--primary-color);
   }
 
   &.pinned:not(:has(input:focus)) .collapsable {
@@ -152,7 +157,7 @@
 
 .item.active,
 .item[value="true"],
-.item[name="append-button"]:hover {
+.item[name="append"]:hover {
   color: var(--primary-color);
 
   &&::after {
@@ -189,6 +194,13 @@
   text-overflow: ellipsis;
   text-wrap: nowrap;
   transition: var(--average-transition) var(--default-animation);
+}
+
+.patternWrapper {
+  padding: 1rem var(--standard-padding) 0 var(--standard-padding);
+  height: 100%;
+  overflow: auto;
+  scrollbar-gutter: stable;
 }
 
 @media (max-width: 768px) {

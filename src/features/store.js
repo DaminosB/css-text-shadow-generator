@@ -1,9 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
 
-import controlsReducer from "./controls/controlsSlice";
+import workflowReducer from "./workflow/workflowSlice";
+import wrapper from "./middlewares/wrapper";
 
 export const store = configureStore({
   reducer: {
-    controls: controlsReducer,
+    workflow: workflowReducer,
   },
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(wrapper),
 });

@@ -6,9 +6,11 @@
   --average-transition: 500ms;
   --default-animation: ease-in-out;
   --fade-in-animation: fade-in var(--fast-transition);
+  --appearance-animation: appearance var(--average-transition);
 
   --gap-between-inputs: 0.75rem;
   --standard-padding: 0.5rem;
+  --bold-padding: 2rem;
 
   --primary-color: #262626;
   --primary-color-light-transparency: #262626bf;
@@ -22,10 +24,14 @@
 
   --default-border: 1px solid var(--secondary-color-medium-transparency);
   --transparent-border: 1px solid transparent;
-  --icon-shadow: drop-shadow(-1px 0px 1px var(--primary-color))
-    drop-shadow(0px -1px 1px var(--primary-color))
-    drop-shadow(1px 0px 1px var(--primary-color))
-    drop-shadow(0px 1px 1px var(--primary-color));
+  --icon-shadow-dark: drop-shadow(-1px 0px 2px var(--primary-color))
+    drop-shadow(0px -1px 2px var(--primary-color))
+    drop-shadow(1px 0px 2px var(--primary-color))
+    drop-shadow(0px 1px 2px var(--primary-color));
+  --icon-shadow-light: drop-shadow(-1px 0px 2px var(--secondary-color))
+    drop-shadow(0px -1px 2px var(--secondary-color))
+    drop-shadow(1px 0px 2px var(--secondary-color))
+    drop-shadow(0px 1px 2px var(--secondary-color));
 
   --styling-panel-x-margins: 1.5rem;
 }
@@ -236,6 +242,11 @@ h1 {
 }
 
 h2 {
+  font-size: 1.5rem;
+}
+
+h3 {
+  font-weight: bold;
   font-size: 1.25rem;
 }
 
@@ -244,8 +255,6 @@ header {
   z-index: 10;
   top: 0px;
   left: var(--sidebar-width);
-  /* width: 100%; */
-  /* padding-left: ; */
   height: var(--header-height);
   display: flex;
   justify-content: space-between;
@@ -283,7 +292,7 @@ label:has(:focus) .extension-bottom {
   opacity: 0;
   border: 1px solid var(--secondary-color);
   margin-top: var(--standard-padding);
-  backdrop-filter: blur(3px);
+  backdrop-filter: blur(5px);
   width: calc(100% - (var(--standard-padding) * 2));
   box-sizing: content-box;
   padding: var(--standard-padding) 0;
@@ -305,7 +314,7 @@ label:has(:focus) .extension-bottom {
 }
 
 .focused {
-  box-shadow: 0px 0px 5px 3px var(--secondary-color);
+  box-shadow: 0px 0px 10px 10px var(--secondary-color-high-transparency);
 }
 
 .grabbable {
@@ -333,6 +342,10 @@ label:has(:focus) .extension-bottom {
   header {
     padding: 0 1rem;
   }
+
+  h3 {
+    font-size: 1rem;
+  }
 }
 
 @media (max-width: 768px) {
@@ -347,5 +360,12 @@ label:has(:focus) .extension-bottom {
   }
   to {
     opacity: 1;
+  }
+}
+
+@keyframes appearance {
+  from {
+    height: 0px;
+    overflow: hidden;
   }
 }

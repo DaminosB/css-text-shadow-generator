@@ -1,0 +1,50 @@
+div:has(> .editorBox) {
+  height: 100%;
+  padding: 0 var(--standard-padding);
+  overflow-y: auto;
+  scrollbar-color: var(--primary-color) transparent;
+  scrollbar-gutter: stable;
+}
+
+.editorBox {
+  text-align: left;
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  margin-top: 1rem;
+  box-shadow: 0px 0px 10px 3px var(--primary-color);
+}
+
+.editorBox > div:last-of-type {
+  position: relative;
+  width: 100%;
+  min-height: 8rem;
+  font-size: 1rem;
+  overflow-y: visible;
+  background-color: var(--primary-color);
+}
+
+.editorBox > div:last-of-type > div {
+  position: absolute;
+  font-size: inherit;
+  overflow: hidden;
+  user-select: none;
+  z-index: 1;
+}
+
+.editorBox > div:last-of-type > textarea {
+  font-family: inherit;
+  font-size: inherit;
+  overflow-y: visible;
+  min-width: calc(100% - 2rem);
+  resize: horizontal;
+  min-height: 100%;
+  text-indent: calc(13ch - 2rem);
+  line-height: 1rem;
+  padding-left: 2rem;
+  color: var(--secondary-color);
+  caret-color: var(--secondary-color);
+  field-sizing: content;
+  scrollbar-gutter: stable;
+  background: none;
+}

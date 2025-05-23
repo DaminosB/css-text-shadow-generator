@@ -2,7 +2,7 @@ import styles from "./SmartButton.module.css";
 
 import { useMemo } from "react";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Icons } from "@/assets/icons/iconsLibrary";
 
 const SmartButton = ({
   inputId,
@@ -17,10 +17,10 @@ const SmartButton = ({
   isDimmed = false,
   disabled = false,
 }) => {
-  const currentIcon = useMemo(() => {
-    if (value && icons?.on) return icons.on;
-    else if (!value && icons?.off) return icons.off;
-    else return icon;
+  const Icon = useMemo(() => {
+    if (value && icons?.on) return Icons[icons.on];
+    else if (!value && icons?.off) return Icons[icons.off];
+    else return Icons[icon];
   }, [icons, icon, value]);
 
   return (
@@ -36,7 +36,7 @@ const SmartButton = ({
           value={value}
           disabled={disabled}
         >
-          <FontAwesomeIcon icon={currentIcon} />
+          <Icon onClick={(e) => e.preventDefault()} />
         </button>
         {text && <span>{text}</span>}
       </div>

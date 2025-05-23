@@ -3,8 +3,8 @@
   /* gap: var(--standard-padding); */
   white-space: nowrap;
   align-items: center;
-  transition: var(--fast-transition) var(--default-animation) allow-discrete;
-  transition: 2500ms var(--default-animation);
+  /* transition: var(--fast-transition) var(--default-animation) allow-discrete;
+  transition: 2500ms var(--default-animation); */
   user-select: none;
   overflow: hidden;
   /* min-width: 1.25rem; */

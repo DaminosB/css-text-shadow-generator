@@ -1,37 +1,68 @@
 import styles from "./Sidebar.module.css";
 
-import { useCallback, useContext } from "react";
-import { WorkspaceCtxt } from "@/components/workspace-window/Workspace/Workspace";
+import { useCallback, useMemo } from "react";
 
 import { useSelector, useDispatch } from "react-redux";
-import { updateState } from "@/features/controls/controlsSlice";
+import {
+  updateControls,
+  commitSettings,
+  updateCollection,
+} from "@/features/workflow/workflowSlice";
 
 import createShadow from "@/config/builders/createShadow";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faBars,
-  faGraduationCap,
-  faPlay,
-  faPlus,
-  faQuestion,
-  faSquareArrowUpRight,
-  faThumbTack,
-  faThumbTackSlash,
-  faXmark,
-} from "@fortawesome/free-solid-svg-icons";
+import { iconsList, Icons } from "@/assets/icons/iconsLibrary";
+const { X, List } = Icons;
+
 import ContentDisplayer from "../ContentDisplayer/ContentDisplayer";
 import SmartButton from "@/components/inputs/SmartButton/SmartButton";
+import CssEditorBox from "../../extras/output/CssEditorBox/CssEditorBox";
+import PatternsList from "../../management/PatternsList/PatternsList";
+import Pattern from "../../management/Pattern/Pattern";
 
-const Sidebar = ({ path }) => {
-  const { manageModale } = useContext(WorkspaceCtxt);
-  const { isOpen, isPinned, data } = useSelector((store) =>
-    path.reduce((acc, entry) => acc[entry], store.controls)
+const Sidebar = () => {
+  const workflow = useSelector((store) => store.workflow);
+
+  const currentData = useMemo(() => workflow.data, [workflow.data]);
+
+  const content = useMemo(
+    () => ({
+      generalSettings: {
+        ...currentData.settings.generalSettings,
+        child: (props) => (
+          <div className={styles.patternWrapper}>
+            <Pattern
+              {...props}
+              path={["data", "settings", "generalSettings", "data"]}
+            />
+          </div>
+        ),
+      },
+      layers: {
+        ...currentData.settings.layers,
+        child: (props) => (
+          <PatternsList {...props} path={["data", "settings", "layers"]} />
+        ),
+      },
+      output: {
+        ...workflow.output,
+        child: (props) => <CssEditorBox {...props} />,
+      },
+    }),
+    []
   );
+
+  const { isOpen, isPinned } = useMemo(
+    () => workflow.controls.sidebar,
+    [workflow.controls.sidebar]
+  );
+
   const dispatch = useDispatch();
 
   const toggleSidebar = useCallback(
     (e) => {
+      if (document.querySelector("dialog[open]")) return;
+
       let newValue;
 
       switch (e.type) {
@@ -42,10 +73,10 @@ const Sidebar = ({ path }) => {
 
         case "pointerleave":
           if (e.pointerType === "mouse") {
-            const sideBarRect = e.currentTarget.getBoundingClientRect();
+            const sidebarRect = e.currentTarget.getBoundingClientRect();
             const isOnSideBar =
-              e.clientX > Math.round(sideBarRect.left) &&
-              e.clientX < Math.round(sideBarRect.right);
+              e.clientX > Math.round(sidebarRect.left) &&
+              e.clientX < Math.round(sidebarRect.right);
 
             newValue = isOnSideBar;
           }
@@ -62,77 +93,168 @@ const Sidebar = ({ path }) => {
           break;
       }
 
-      if (newValue !== undefined) {
-        dispatch(updateState({ path, key: "isOpen", value: newValue }));
+      if (newValue !== undefined && newValue !== isOpen) {
+        dispatch(
+          updateControls({ target: "sidebar", key: "isOpen", value: newValue })
+        );
       }
     },
-    [path, isOpen, dispatch]
+    [isOpen, dispatch]
   );
 
   const togglePin = useCallback(() => {
-    dispatch(updateState({ path, key: "isPinned", value: !isPinned }));
+    dispatch(
+      updateControls({
+        target: "sidebar",
+        key: "isPinned",
+        value: !isPinned,
+      })
+    );
     document.activeElement.blur();
-  }, [dispatch, isPinned, path]);
+  }, [dispatch, isPinned]);
 
-  const toggleItems = useCallback(
+  const toggleContent = useCallback(
     (activeContent) => {
       if (!isOpen) {
-        dispatch(updateState({ path, key: "isOpen", value: true }));
+        dispatch(
+          updateControls({
+            target: "sidebar",
+            key: "isOpen",
+            value: true,
+          })
+        );
       }
 
-      Object.entries(data).forEach(([name]) => {
-        const targetPath = [...path, "data", name];
-
-        const targetValue = name === activeContent;
-
-        dispatch(
-          updateState({ path: targetPath, key: "isOpen", value: targetValue })
-        );
-      });
+      dispatch(
+        updateControls({
+          target: "sidebar",
+          key: "content",
+          value: activeContent,
+        })
+      );
 
       document.activeElement.blur();
     },
-    [dispatch, path, data, isOpen]
+    [dispatch, isOpen]
   );
 
-  const handleToggleItems = useCallback(
+  const handleToggleContent = useCallback(
     (e) => {
       const buttonName = e.currentTarget.name;
-      toggleItems(buttonName);
+      toggleContent(buttonName);
     },
-    [toggleItems]
+    [toggleContent]
   );
 
   const addShadowAndScroll = useCallback(() => {
-    toggleItems("layers");
+    toggleContent("layers");
 
     if (!isOpen) {
-      dispatch(updateState({ path, key: "isOpen", value: true }));
+      dispatch(
+        updateControls({
+          target: "sidebar",
+          key: "isOpen",
+          value: true,
+        })
+      );
     }
 
+    const dataLength = currentData.settings.layers.data.length;
+
     dispatch(
-      updateState({
-        path: [...path, "data", "layers"],
-        key: "data",
-        value: [...data.layers.data, createShadow()],
+      updateCollection({
+        category: "layers",
+        targetIndex: dataLength,
+        target: createShadow(),
+        newIndex: dataLength,
+      })
+    );
+
+    const commitLabel = `layer #${dataLength} created`;
+
+    dispatch(
+      commitSettings({
+        category: "layers",
+        changedIndex: dataLength,
+        label: commitLabel,
+        inputIcon: iconsList.StackPlus,
       })
     );
 
     requestAnimationFrame(() => {
-      const scroller = document.getElementById(layers.id);
-      scroller.scrollTo({
-        top: scroller.scrollHeight,
-        behavior: "smooth",
-      });
-    });
-  }, [dispatch, data, path, toggleItems, isOpen]);
+      const scroller = document.getElementById("layers");
 
-  const openModale = useCallback(
+      scroller.scrollTo({ top: scroller.scrollHeight, behavior: "smooth" });
+    });
+  }, [currentData.settings.layers.data, dispatch, toggleContent, isOpen]);
+
+  const openModale = useCallback((e) => {
+    const modal = document.getElementById(e.currentTarget.name);
+    modal.showModal();
+  }, []);
+
+  const openDemoMode = useCallback(
     (e) => {
-      manageModale(e.currentTarget.name, true);
+      dispatch(
+        updateControls({
+          target: "demo",
+          key: "cache",
+          value: currentData.settings,
+        })
+      );
+
+      dispatch(updateControls({ target: "demo", key: "step", value: 0 }));
+
+      openModale(e);
     },
-    [manageModale]
+    [dispatch, currentData, openModale]
   );
+
+  const actions = useMemo(
+    () => ({
+      addShadowAndScroll: {
+        callback: addShadowAndScroll,
+        disabled: false,
+      },
+      openDemoMode: {
+        callback: openDemoMode,
+        disabled: false,
+      },
+      openModale: {
+        callback: openModale,
+        disabled: false,
+      },
+    }),
+    [addShadowAndScroll, openDemoMode, openModale]
+  );
+
+  const { appendButton, auxButtons } = useMemo(() => {
+    const buttons = workflow.controls.sidebar.buttons;
+
+    return Object.entries(buttons).reduce(
+      (acc, [buttonName, { id, config }]) => {
+        const baseConfig = {
+          ...config,
+          rawIcon: Icons[config.icon],
+          action:
+            config.type === "action" && actions[config.value]
+              ? actions[config.value].callback
+              : null,
+        };
+
+        if (buttonName === "append") {
+          acc.appendButton = { id, config: baseConfig };
+        } else {
+          acc.auxButtons[buttonName] = { id, config: baseConfig };
+        }
+
+        return acc;
+      },
+      { appendButton: null, auxButtons: {} }
+    );
+  }, [workflow.controls.sidebar.buttons, actions]);
+
+  const AppendIcon = useMemo(() => appendButton.config.rawIcon, [appendButton]);
 
   return (
     <div className={styles.sidebar}>
@@ -140,14 +262,14 @@ const Sidebar = ({ path }) => {
         className={`${isOpen ? styles.open : ""} ${
           isPinned ? styles.pinned : ""
         }`}
-        data-path={path}
         onPointerEnter={toggleSidebar}
         onPointerLeave={toggleSidebar}
       >
         <div>
           <SmartButton
             inputId="pin-sidebar"
-            icons={{ on: faThumbTack, off: faThumbTackSlash }}
+            name="pin-sidebar"
+            icons={{ on: iconsList.PushPin, off: iconsList.PushPinSlash }}
             value={isPinned}
             onClick={togglePin}
           />
@@ -158,31 +280,30 @@ const Sidebar = ({ path }) => {
           onClick={toggleSidebar}
         >
           <div>
-            <FontAwesomeIcon icon={faBars} />
+            <List />
           </div>
           <div>
-            <FontAwesomeIcon icon={faXmark} />
+            <X />
           </div>
         </button>
         <div>
           <div className={styles.openers}>
             <div>
-              {Object.entries(data).map(([name, attributes]) => {
-                const buttonPath = [...path, "data", name];
-                const isActive = attributes.isOpen;
+              {Object.entries(content).map(([name, attributes]) => {
+                const isActive = workflow.controls.sidebar.content === name;
                 const className = `${styles.item} ${
                   isActive ? styles.active : ""
                 }`;
+                const Icon = Icons[attributes.icon];
                 return (
                   <button
                     key={attributes.id}
-                    data-path={buttonPath}
                     name={name}
                     className={className}
-                    onClick={handleToggleItems}
+                    onClick={handleToggleContent}
                   >
                     <div>
-                      <FontAwesomeIcon icon={attributes.icon} />
+                      <Icon />
                     </div>
                     <span className={styles.collapsable}>
                       {attributes.label}
@@ -194,57 +315,53 @@ const Sidebar = ({ path }) => {
             <div>
               <button
                 className={styles.item}
-                id="append-button"
-                name="append-button"
-                onClick={addShadowAndScroll}
+                id={appendButton.id}
+                name={appendButton.config.name}
+                onClick={appendButton.config.action}
               >
                 <div>
-                  <FontAwesomeIcon icon={faPlus} />
+                  <AppendIcon />
                 </div>
-                <span className={styles.collapsable}>Add a layer</span>
+                <span className={styles.collapsable}>
+                  {appendButton.config.labelText}
+                </span>
               </button>
             </div>
             <div>
-              <button
-                className={styles.auxButton}
-                name="demo"
-                onClick={openModale}
-              >
-                <div>
-                  <FontAwesomeIcon icon={faPlay} />
-                </div>
-                <span className={styles.collapsable}>Demo mode</span>
-              </button>
-              <button className={styles.auxButton} name="learn">
-                <a
-                  href="https://developer.mozilla.org/en-US/docs/Web/CSS/text-shadow"
-                  target="_blank"
-                >
-                  <div>
-                    <FontAwesomeIcon icon={faGraduationCap} />
-                  </div>
-                  <span className={styles.collapsable}>
-                    Learn{" "}
-                    <span>
-                      <FontAwesomeIcon icon={faSquareArrowUpRight} />
-                    </span>
-                  </span>
-                </a>
-              </button>
-              <button
-                className={styles.auxButton}
-                name={"about"}
-                // onClick={openAboutModale}
-                onClick={openModale}
-              >
-                <div>
-                  <FontAwesomeIcon icon={faQuestion} />
-                </div>
-                <span className={styles.collapsable}>About</span>
-              </button>
+              {Object.entries(auxButtons).map(
+                ([buttonName, { id, config }]) => {
+                  const Icon = config.rawIcon;
+
+                  const Wrapper = ({ children }) =>
+                    config.type === "link" ? (
+                      <a href={config.value} target="_blank">
+                        {children}
+                      </a>
+                    ) : (
+                      <>{children}</>
+                    );
+
+                  return (
+                    <Wrapper key={id}>
+                      <button
+                        className={styles.auxButton}
+                        name={buttonName}
+                        onClick={config.action}
+                      >
+                        <div>
+                          <Icon />
+                        </div>
+                        <span className={styles.collapsable}>
+                          {config.labelText}
+                        </span>
+                      </button>
+                    </Wrapper>
+                  );
+                }
+              )}
             </div>
           </div>
-          <ContentDisplayer path={[...path, "data"]} />
+          <ContentDisplayer content={content} />
         </div>
       </nav>
     </div>

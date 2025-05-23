@@ -1,6 +1,8 @@
 import styles from "./HeadingIcon.module.css";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useMemo } from "react";
+
+import { Icons } from "@/assets/icons/iconsLibrary";
 
 const HeadingIcon = ({ icon, label, format, onClick }) => {
   const handleOnClick = (e) => {
@@ -10,6 +12,9 @@ const HeadingIcon = ({ icon, label, format, onClick }) => {
   const handleStopPropagation = (e) => {
     e.stopPropagation();
   };
+
+  const Icon = useMemo(() => Icons[icon], [icon]);
+
   return (
     <div
       className={`${styles.title} ${onClick ? styles.cursor : ""}`}
@@ -17,7 +22,7 @@ const HeadingIcon = ({ icon, label, format, onClick }) => {
       onPointerDown={onClick ? handleStopPropagation : null}
     >
       <div>
-        <FontAwesomeIcon icon={icon} />
+        <Icon />
       </div>
       <div>
         {label && (

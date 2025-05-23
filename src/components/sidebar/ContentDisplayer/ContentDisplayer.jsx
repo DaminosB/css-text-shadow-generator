@@ -2,39 +2,25 @@ import styles from "./ContentDisplayer.module.css";
 
 import { useSelector } from "react-redux";
 
-import PatternsList from "../PatternsList/PatternsList";
-import CssEditorBox from "../CssEditorBox/CssEditorBox";
-
-const ContentDisplayer = ({ path }) => {
-  const target = useSelector((store) =>
-    path.reduce((acc, entry) => acc[entry], store.controls)
+const ContentDisplayer = ({ content }) => {
+  const sidebarContent = useSelector(
+    (store) => store.workflow.controls.sidebar.content
   );
 
   return (
     <div className={styles.container}>
-      {Object.entries(target).map(([name, attributes], index) => {
+      {Object.entries(content).map(([name, attributes], index) => {
         const inlineStyle = { transform: `translateY(-${index * 100}%)` };
-        if (name !== "output") {
-          return (
-            <div
-              key={attributes.id}
-              className={attributes.isOpen ? styles.active : ""}
-              style={inlineStyle}
-            >
-              <PatternsList path={[...path, name]} />
-            </div>
-          );
-        } else {
-          return (
-            <div
-              key={attributes.id}
-              className={attributes.isOpen ? styles.active : ""}
-              style={inlineStyle}
-            >
-              <CssEditorBox />
-            </div>
-          );
-        }
+        const Content = attributes.child;
+        return (
+          <div
+            key={attributes.id}
+            className={sidebarContent === name ? styles.active : ""}
+            style={inlineStyle}
+          >
+            <Content />
+          </div>
+        );
       })}
     </div>
   );

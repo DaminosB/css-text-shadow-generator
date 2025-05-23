@@ -1,33 +1,49 @@
 import styles from "./TextPreview.module.css";
 
-import fontLibrary from "@/config/fonts/googleFonts";
-
-import { useMemo, useContext } from "react";
-import { WorkspaceCtxt } from "../Workspace/Workspace";
+import fontLibrary from "@/assets/fonts/googleFonts";
 
 import { useSelector, useDispatch } from "react-redux";
-import { updateState } from "@/features/controls/controlsSlice";
+import {
+  commitSettings,
+  updateControls,
+  updateSettings,
+} from "@/features/workflow/workflowSlice";
 
-const TextPreview = ({ path }) => {
-  const { modalContent } = useContext(WorkspaceCtxt);
-  const { items, text } = useSelector(({ controls }) => controls);
-  const output = useMemo(() => items.data.output, [items.data.output]);
-  const generalSettingsData = items.data.generalSettings.data[0];
+import { useMemo, useRef } from "react";
+import { iconsList } from "@/assets/icons/iconsLibrary";
 
-  const isDemoMode = useMemo(() => modalContent === "demo", [modalContent]);
+const TextPreview = () => {
+  const workflow = useSelector((store) => store.workflow);
+
+  const output = useMemo(() => workflow.output, [workflow.output]);
+
+  const generalSettingsData = useMemo(
+    () => workflow.data.settings.generalSettings.data,
+    [workflow.data.settings.generalSettings.data]
+  );
+
+  const text = useMemo(
+    () => generalSettingsData.inputs.userText,
+    [generalSettingsData.inputs.userText]
+  );
+  const isDemoMode = useMemo(
+    () => workflow.controls.demo.step != null,
+    [workflow.controls.demo.step]
+  );
 
   const dispatch = useDispatch();
 
+  const cachedValue = useRef(text.value);
+
   const updateUserText = (e) => {
     dispatch(
-      updateState({
-        path,
+      updateSettings({
+        path: ["generalSettings", "data", "inputs", "userText"],
         key: "value",
         value: e.target.value,
       })
     );
   };
-
   const textShadow = useMemo(
     () => output.data.map((o) => o.string).join(", "),
     [output.data]
@@ -44,15 +60,57 @@ const TextPreview = ({ path }) => {
     [generalSettingsData, textShadow]
   );
 
+  const handleOnBlur = (e) => {
+    if (e.target.value === cachedValue.current) {
+      return;
+    } else if (e.target.value) {
+      const commitLabel = `Text: ${text.value}`;
+      dispatch(
+        commitSettings({
+          category: "generalSettings",
+          label: commitLabel,
+          inputIcon: iconsList.Pencil,
+        })
+      );
+      cachedValue.current = e.target.value;
+    } else {
+      dispatch(
+        updateSettings({
+          path: ["generalSettings", "data", "inputs", "userText"],
+          key: "value",
+          value: cachedValue.current,
+        })
+      );
+    }
+  };
+
+  const handlePointerOut = (e) => {
+    if (document.activeElement === e.currentTarget) {
+      e.currentTarget.blur();
+    }
+  };
+
+  const closeSidebar = () => {
+    if (workflow.controls.sidebar.isOpen) {
+      dispatch(
+        updateControls({ target: "sidebar", key: "isOpen", value: false })
+      );
+    }
+  };
+
   return (
     <div className={styles.textPreview}>
       <textarea
-        id={text.id}
+        id={text.inputId}
         name="userText"
+        autoFocus
         style={textStyle}
         className={isDemoMode ? styles.transition : ""}
         value={text.value}
+        onFocus={closeSidebar}
         onChange={updateUserText}
+        onBlur={handleOnBlur}
+        onPointerOut={handlePointerOut}
       ></textarea>
     </div>
   );
