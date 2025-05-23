@@ -38,7 +38,14 @@ const TextPreview = () => {
   const updateUserText = (e) => {
     dispatch(
       updateSettings({
-        path: ["generalSettings", "data", "inputs", "userText"],
+        path: [
+          "data",
+          "settings",
+          "generalSettings",
+          "data",
+          "inputs",
+          "userText",
+        ],
         key: "value",
         value: e.target.value,
       })
@@ -76,7 +83,14 @@ const TextPreview = () => {
     } else {
       dispatch(
         updateSettings({
-          path: ["generalSettings", "data", "inputs", "userText"],
+          path: [
+            "data",
+            "settings",
+            "generalSettings",
+            "data",
+            "inputs",
+            "userText",
+          ],
           key: "value",
           value: cachedValue.current,
         })
